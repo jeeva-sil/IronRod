@@ -146,7 +146,7 @@ def create_minimal_placeholder():
     with open(path, 'wb') as f:
         f.write(bmp)
     print(f"  Created placeholder: {path}")
-    print("  ⚠  Install Pillow for proper icon generation: pip install Pillow")
+    print("  [WARN] Install Pillow for proper icon generation: pip install Pillow")
     return None
 
 
@@ -158,14 +158,14 @@ def save_icons(img):
     # PNG — 1024x1024 (Linux, source)
     png_path = os.path.join(ASSETS_DIR, 'icon.png')
     img.save(png_path, 'PNG')
-    print(f"  ✅ {png_path} (1024x1024)")
+    print(f"  [OK] {png_path} (1024x1024)")
 
     # ICO — Windows (multiple sizes)
     ico_path = os.path.join(ASSETS_DIR, 'icon.ico')
     ico_sizes = [(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
     ico_images = [img.resize(s, resample=3) for s in ico_sizes]  # LANCZOS = 3
     ico_images[0].save(ico_path, format='ICO', sizes=ico_sizes)
-    print(f"  ✅ {ico_path} (16–256px)")
+    print(f"  [OK] {ico_path} (16-256px)")
 
     # ICNS — macOS
     icns_path = os.path.join(ASSETS_DIR, 'icon.icns')
@@ -194,15 +194,15 @@ def save_icons(img):
             ['iconutil', '-c', 'icns', iconset_dir, '-o', icns_path],
             check=True, capture_output=True,
         )
-        print(f"  ✅ {icns_path} (macOS iconutil)")
+        print(f"  [OK] {icns_path} (macOS iconutil)")
     except (FileNotFoundError, subprocess.CalledProcessError):
         # Fallback: save as PNG (PyInstaller can use PNG on macOS too)
         img.resize((512, 512), resample=3).save(icns_path.replace('.icns', '.png'), 'PNG')
-        print(f"  ⚠  iconutil not found — saved icon.png instead (use on macOS to generate .icns)")
+        print(f"  [WARN] iconutil not found - saved icon.png instead (use on macOS to generate .icns)")
 
 
 def main():
-    print("🎨 Generating IronRod app icons...")
+    print("[*] Generating IronRod app icons...")
     print()
 
     if len(sys.argv) > 1:
