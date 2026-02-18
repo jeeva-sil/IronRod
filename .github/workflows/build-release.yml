@@ -58,7 +58,7 @@ jobs:
           pip install -r requirements-build.txt
 
       - name: Generate icons
-        run: python assets/generate_icons.py
+        run: python -X utf8 assets/generate_icons.py
 
       - name: Build with PyInstaller
         run: |
@@ -125,8 +125,14 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-build.txt
 
-      - name: Generate icons
-        run: python assets/generate_icons.py
+      - name: Generate icons (if missing)
+        shell: powershell
+        run: |
+          if ((Test-Path "assets/icon.ico") -and (Test-Path "assets/icon.png") -and (Test-Path "assets/icon.icns")) {
+            Write-Host "Icons already present; skipping generation."
+          } else {
+            python -X utf8 assets/generate_icons.py
+          }
 
       - name: Build with PyInstaller
         run: pyinstaller IronRod.spec --noconfirm --clean
@@ -190,7 +196,7 @@ jobs:
           pip install -r requirements-build.txt
 
       - name: Generate icons
-        run: python assets/generate_icons.py
+        run: python -X utf8 assets/generate_icons.py
 
       - name: Build with PyInstaller
         run: pyinstaller IronRod.spec --noconfirm --clean
