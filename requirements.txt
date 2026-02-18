@@ -1,0 +1,12 @@
+# Core dependencies
+pytsk3>=20240506            # The Sleuth Kit Python bindings — filesystem-level deleted file recovery
+Pillow>=10.0                # Deep image validation — ensures recovered files are actually readable
+tkinterweb>=4.19            # HTML rendering for in-app ad banners (Google AdSense support)
+pywebview>=6.0              # Native browser webview for ad rendering with JavaScript support
+
+# Optional (gracefully degraded if missing)
+# pyewf                     # E01 disk image support (requires libewf)
+
+# If tkinter is missing on Linux:
+#   sudo apt install python3-tk       (Debian/Ubuntu)
+#   sudo dnf install python3-tkinter  (Fedora)
