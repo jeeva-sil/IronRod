@@ -23,6 +23,7 @@ permissions:
 env:
   APP_NAME: IronRod
   PYTHON_VERSION: '3.12'
+  PYTHONIOENCODING: utf-8
 
 jobs:
   # ════════════════════════════════════════════════════════════
