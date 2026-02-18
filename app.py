@@ -8,6 +8,8 @@ disk images) across all major filesystems (exFAT, FAT12/16/32,
 NTFS, ext2/3/4, HFS+, APFS, Btrfs, XFS, F2FS, UDF, ISO 9660).
 """
 
+APP_VERSION = "1.0"
+
 import os
 import sys
 import time
@@ -127,7 +129,7 @@ class DataRecoveryApp:
     # ─── Window ───────────────────────────────────────────────
 
     def _setup_window(self):
-        self.root.title("📸 Deleted Photo & Video Recovery")
+        self.root.title(f"📸 IronRod Data Recovery  v{APP_VERSION}")
         self.root.geometry("1200x800")
         self.root.minsize(900, 600)
         self.root.configure(bg=BG_DARK)

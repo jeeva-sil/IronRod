@@ -1,0 +1,354 @@
+# ──────────────────────────────────────────────────────────────
+# IronRod — Cross-platform build & release workflow
+# Builds macOS .dmg, Windows .exe installer + portable zip, Linux AppImage + .deb + .tar.gz
+# ──────────────────────────────────────────────────────────────
+# Triggered on version tags: git tag v1.0.0 && git push --tags
+
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+permissions:
+  contents: write
+
+env:
+  APP_NAME: IronRod
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  # ════════════════════════════════════════════════════════════
+  # macOS — .app bundle + .dmg installer
+  # ════════════════════════════════════════════════════════════
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch: [x86_64, arm64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt || true
+          pip install -r requirements-build.txt
+
+      - name: Generate icons
+        run: python assets/generate_icons.py
+
+      - name: Build with PyInstaller
+        run: |
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            pyinstaller IronRod.spec --noconfirm --clean --target-arch arm64
+          else
+            pyinstaller IronRod.spec --noconfirm --clean --target-arch x86_64
+          fi
+
+      - name: Create DMG
+        run: |
+          brew install create-dmg || true
+          DMG_TEMP="dist/dmg_temp"
+          mkdir -p "$DMG_TEMP"
+          cp -R "dist/${{ env.APP_NAME }}.app" "$DMG_TEMP/"
+          ln -s /Applications "$DMG_TEMP/Applications"
+
+          create-dmg \
+            --volname "${{ env.APP_NAME }}" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --icon "${{ env.APP_NAME }}.app" 150 190 \
+            --app-drop-link 450 190 \
+            --no-internet-enable \
+            "dist/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-macOS-${{ matrix.arch }}.dmg" \
+            "$DMG_TEMP/" \
+          || hdiutil create -volname "${{ env.APP_NAME }}" \
+               -srcfolder "$DMG_TEMP" -ov -format UDZO \
+               "dist/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-macOS-${{ matrix.arch }}.dmg"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.arch }}
+          path: dist/*.dmg
+
+  # ════════════════════════════════════════════════════════════
+  # Windows — NSIS installer + portable ZIP
+  # ════════════════════════════════════════════════════════════
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Get version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
+          pip install -r requirements-build.txt
+
+      - name: Generate icons
+        run: python assets/generate_icons.py
+
+      - name: Build with PyInstaller
+        run: pyinstaller IronRod.spec --noconfirm --clean
+
+      - name: Create portable ZIP
+        shell: powershell
+        run: |
+          Compress-Archive -Path "dist\${{ env.APP_NAME }}" `
+            -DestinationPath "dist\${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-Windows-Portable.zip" -Force
+
+      - name: Install NSIS
+        shell: powershell
+        run: |
+          choco install nsis -y
+
+      - name: Create NSIS installer
+        shell: cmd
+        run: |
+          makensis /DVERSION=${{ steps.version.outputs.version }} /DOUTFILE="dist\${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-Windows-Setup.exe" scripts\installer.nsi
+        continue-on-error: true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            dist/*.zip
+            dist/*-Setup.exe
+
+  # ════════════════════════════════════════════════════════════
+  # Linux — AppImage + .deb + .tar.gz
+  # ════════════════════════════════════════════════════════════
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-tk libfuse2
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt || true
+          pip install -r requirements-build.txt
+
+      - name: Generate icons
+        run: python assets/generate_icons.py
+
+      - name: Build with PyInstaller
+        run: pyinstaller IronRod.spec --noconfirm --clean
+
+      - name: Create portable tarball
+        run: |
+          cd dist
+          tar czf "${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-Linux-x86_64.tar.gz" "${{ env.APP_NAME }}/"
+
+      - name: Create .deb package
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          DEB_ROOT="dist/deb_build"
+          mkdir -p "$DEB_ROOT/DEBIAN"
+          mkdir -p "$DEB_ROOT/opt/ironrod"
+          mkdir -p "$DEB_ROOT/usr/local/bin"
+          mkdir -p "$DEB_ROOT/usr/share/applications"
+          mkdir -p "$DEB_ROOT/usr/share/icons/hicolor/256x256/apps"
+
+          cp -R dist/${{ env.APP_NAME }}/* "$DEB_ROOT/opt/ironrod/"
+
+          cat > "$DEB_ROOT/usr/local/bin/ironrod" << 'EOF'
+          #!/bin/bash
+          exec /opt/ironrod/IronRod "$@"
+          EOF
+          chmod +x "$DEB_ROOT/usr/local/bin/ironrod"
+          # Fix indentation in launcher script
+          sed -i 's/^          //' "$DEB_ROOT/usr/local/bin/ironrod"
+
+          [ -f assets/icon.png ] && cp assets/icon.png "$DEB_ROOT/usr/share/icons/hicolor/256x256/apps/ironrod.png"
+
+          cat > "$DEB_ROOT/usr/share/applications/ironrod.desktop" << EOF
+          [Desktop Entry]
+          Name=IronRod Data Recovery
+          Comment=Recover deleted files from any storage device
+          Exec=pkexec /opt/ironrod/IronRod
+          Icon=ironrod
+          Terminal=false
+          Type=Application
+          Categories=Utility;System;
+          EOF
+          sed -i 's/^          //' "$DEB_ROOT/usr/share/applications/ironrod.desktop"
+
+          INSTALLED_SIZE=$(du -sk "$DEB_ROOT/opt/ironrod" | cut -f1)
+          cat > "$DEB_ROOT/DEBIAN/control" << EOF
+          Package: ironrod
+          Version: ${VERSION}
+          Section: utils
+          Priority: optional
+          Architecture: amd64
+          Installed-Size: ${INSTALLED_SIZE}
+          Depends: libc6 (>= 2.17), libx11-6, python3-tk
+          Maintainer: IronRod Team <support@ironrod.dev>
+          Description: Universal Data Recovery Tool
+           Recover deleted photos, videos, documents and more from
+           any storage device using raw binary file-signature carving.
+          EOF
+          sed -i 's/^          //' "$DEB_ROOT/DEBIAN/control"
+
+          dpkg-deb --build "$DEB_ROOT" "dist/ironrod_${VERSION}_amd64.deb"
+
+      - name: Create AppImage
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          # Download appimagetool
+          wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O appimagetool
+          chmod +x appimagetool
+
+          APPDIR="dist/AppDir"
+          mkdir -p "$APPDIR/usr/bin"
+          mkdir -p "$APPDIR/usr/share/applications"
+          mkdir -p "$APPDIR/usr/share/icons/hicolor/256x256/apps"
+
+          cp -R dist/${{ env.APP_NAME }}/* "$APPDIR/usr/bin/"
+          [ -f assets/icon.png ] && cp assets/icon.png "$APPDIR/ironrod.png"
+          [ -f assets/icon.png ] && cp assets/icon.png "$APPDIR/usr/share/icons/hicolor/256x256/apps/ironrod.png"
+
+          cat > "$APPDIR/ironrod.desktop" << EOF
+          [Desktop Entry]
+          Name=IronRod Data Recovery
+          Exec=IronRod
+          Icon=ironrod
+          Type=Application
+          Categories=Utility;System;
+          EOF
+          sed -i 's/^          //' "$APPDIR/ironrod.desktop"
+          cp "$APPDIR/ironrod.desktop" "$APPDIR/usr/share/applications/"
+
+          cat > "$APPDIR/AppRun" << 'EOF'
+          #!/bin/bash
+          HERE="$(dirname "$(readlink -f "$0")")"
+          exec "$HERE/usr/bin/IronRod" "$@"
+          EOF
+          sed -i 's/^          //' "$APPDIR/AppRun"
+          chmod +x "$APPDIR/AppRun"
+
+          ARCH=x86_64 ./appimagetool "$APPDIR" "dist/${{ env.APP_NAME }}-${VERSION}-Linux-x86_64.AppImage"
+        continue-on-error: true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            dist/*.tar.gz
+            dist/*.deb
+            dist/*.AppImage
+
+  # ════════════════════════════════════════════════════════════
+  # Create GitHub Release with all artifacts
+  # ════════════════════════════════════════════════════════════
+  release:
+    needs: [build-macos, build-windows, build-linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: List release assets
+        run: find release-assets -type f | head -20
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "IronRod v${{ steps.version.outputs.version }}"
+          draft: true
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            release-assets/**/*.dmg
+            release-assets/**/*.exe
+            release-assets/**/*.zip
+            release-assets/**/*.tar.gz
+            release-assets/**/*.deb
+            release-assets/**/*.AppImage
+          body: |
+            ## 📦 Downloads
+
+            | Platform | File | Description |
+            |----------|------|-------------|
+            | 🍎 macOS (Intel) | `IronRod-${{ steps.version.outputs.version }}-macOS-x86_64.dmg` | DMG installer — drag to Applications |
+            | 🍎 macOS (Apple Silicon) | `IronRod-${{ steps.version.outputs.version }}-macOS-arm64.dmg` | DMG installer for M1/M2/M3 |
+            | 🪟 Windows (Installer) | `IronRod-${{ steps.version.outputs.version }}-Windows-Setup.exe` | NSIS installer — adds to Start Menu |
+            | 🪟 Windows (Portable) | `IronRod-${{ steps.version.outputs.version }}-Windows-Portable.zip` | No install needed — extract & run |
+            | 🐧 Linux (AppImage) | `IronRod-${{ steps.version.outputs.version }}-Linux-x86_64.AppImage` | Universal — chmod +x & run |
+            | 🐧 Linux (.deb) | `ironrod_${{ steps.version.outputs.version }}_amd64.deb` | Debian/Ubuntu — `sudo dpkg -i` |
+            | 🐧 Linux (Portable) | `IronRod-${{ steps.version.outputs.version }}-Linux-x86_64.tar.gz` | Extract & run |
+
+            ## ⚠️ Important
+            - **Raw disk access requires elevated privileges**
+              - macOS/Linux: `sudo` or run as root
+              - Windows: Run as Administrator

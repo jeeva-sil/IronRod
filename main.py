@@ -8,11 +8,106 @@ Usage:
     sudo python main.py --cli   # Terminal mode
 """
 
+APP_VERSION = "1.0"
+
 import os
 import sys
 import time
 import argparse
 import platform
+import subprocess
+
+
+def _request_admin_privileges():
+    """
+    Re-launch this process with admin (root) privileges.
+    - macOS: opens Terminal.app with sudo (needed for GUI display access)
+    - Linux: uses pkexec or sudo
+    - Windows: uses UAC elevation via ShellExecute
+    Returns True if already running as admin, otherwise re-launches and exits.
+    """
+    _sys = platform.system()
+
+    if _sys in ("Darwin", "Linux"):
+        if os.geteuid() == 0:
+            return True  # Already root
+
+        if _sys == "Darwin":
+            import shlex
+
+            if getattr(sys, 'frozen', False):
+                # Running as .app bundle
+                app_exe = sys.executable
+                parts = [app_exe] + sys.argv[1:] + ["--no-elevate"]
+            else:
+                # Running as script
+                python_exe = sys.executable
+                script = os.path.abspath(sys.argv[0])
+                parts = [python_exe, script] + sys.argv[1:] + ["--no-elevate"]
+
+            shell_cmd = " ".join(shlex.quote(p) for p in parts)
+
+            # Use AppleScript to open Terminal.app and run with sudo.
+            # This gives the elevated process full GUI + display access.
+            applescript = (
+                f'tell application "Terminal"\n'
+                f'    activate\n'
+                f'    do script "sudo {shell_cmd}; exit"\n'
+                f'end tell'
+            )
+
+            try:
+                subprocess.Popen(["osascript", "-e", applescript])
+            except Exception:
+                # Fallback: just print instructions
+                print(f"Run with: sudo {shell_cmd}")
+            sys.exit(0)
+
+        elif _sys == "Linux":
+            python_exe = sys.executable
+            script = os.path.abspath(sys.argv[0])
+            args_list = sys.argv[1:]
+
+            if getattr(sys, 'frozen', False):
+                exec_args = [sys.executable] + args_list
+            else:
+                exec_args = [python_exe, script] + args_list
+
+            # Try pkexec first (graphical), then fallback to sudo
+            for elevate_cmd in (["pkexec"], ["sudo"]):
+                try:
+                    os.execvp(elevate_cmd[0], elevate_cmd + exec_args)
+                except FileNotFoundError:
+                    continue
+            print("Could not elevate privileges. Run with: sudo", " ".join(exec_args))
+            sys.exit(1)
+
+    elif _sys == "Windows":
+        try:
+            import ctypes
+            if ctypes.windll.shell32.IsUserAnAdmin():
+                return True  # Already admin
+        except Exception:
+            return True  # Can't check, assume OK
+
+        # Re-launch with UAC elevation
+        if getattr(sys, 'frozen', False):
+            exe = sys.executable
+            params = " ".join(sys.argv[1:])
+        else:
+            exe = sys.executable
+            params = f'"{os.path.abspath(sys.argv[0])}" ' + " ".join(sys.argv[1:])
+
+        try:
+            import ctypes
+            ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", exe, params, None, 1
+            )
+        except Exception:
+            print("Admin privileges required. Right-click → Run as Administrator.")
+        sys.exit(0)
+
+    return True
 
 
 def cli_mode(args):
@@ -21,7 +116,7 @@ def cli_mode(args):
     from recovery.trim_detect import detect_drive_health
 
     print("=" * 60)
-    print("  📸 Deleted Photo & Video Recovery")
+    print(f"  📸 IronRod Data Recovery  v{APP_VERSION}")
     print("  Raw binary file carving from disk sectors")
     print("=" * 60)
     print()
@@ -302,7 +397,13 @@ def main():
                         help="Skip TRIM warning confirmation")
     parser.add_argument("--skip-trim-check", action="store_true",
                         help="Skip SSD/TRIM detection entirely")
+    parser.add_argument("--no-elevate", action="store_true",
+                        help="Don't auto-request admin privileges")
     args = parser.parse_args()
+
+    # Auto-request admin privileges (required for raw disk access)
+    if not args.no_elevate:
+        _request_admin_privileges()
 
     if args.cli:
         cli_mode(args)

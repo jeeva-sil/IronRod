@@ -1,0 +1,3 @@
+# Build dependencies — install with: pip install -r requirements-build.txt
+pyinstaller>=6.0
+Pillow>=10.0

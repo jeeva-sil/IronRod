@@ -99,4 +99,4 @@ recovery/
 
 ## License
 
-MIT
+Freeware — Free to use for personal and commercial purposes. All rights reserved.

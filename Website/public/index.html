@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IronRod — Universal Data Recovery</title>
+  <meta name="description"
+    content="Recover deleted photos, videos, documents and more from any storage device. 100% free, cross-platform.">
+  <meta name="theme-color" content="#0f0f1a">
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+    crossorigin="anonymous"></script>
+
+  <style>
+    /* ─── Reset & Base ─────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0a14;
+      color: #e0e0e8;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    /* ─── Animated Background ──────────────────────── */
+    .bg-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-glow .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.25;
+      animation: orbFloat 20s ease-in-out infinite alternate;
+    }
+
+    .bg-glow .orb:nth-child(1) {
+      width: 600px;
+      height: 600px;
+      background: #7aa2f7;
+      top: -10%;
+      left: -5%;
+      animation-delay: 0s;
+    }
+
+    .bg-glow .orb:nth-child(2) {
+      width: 500px;
+      height: 500px;
+      background: #9ece6a;
+      bottom: -15%;
+      right: -10%;
+      animation-delay: -7s;
+    }
+
+    .bg-glow .orb:nth-child(3) {
+      width: 400px;
+      height: 400px;
+      background: #bb9af7;
+      top: 40%;
+      left: 50%;
+      animation-delay: -14s;
+    }
+
+    @keyframes orbFloat {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      33% {
+        transform: translate(60px, -40px) scale(1.1);
+      }
+
+      66% {
+        transform: translate(-30px, 50px) scale(0.95);
+      }
+
+      100% {
+        transform: translate(20px, -20px) scale(1.05);
+      }
+    }
+
+    /* ─── Container ────────────────────────────────── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── Navbar ───────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      background: rgba(10, 10, 20, 0.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(122, 162, 247, 0.1);
+      transition: background 0.3s;
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #7aa2f7, #9ece6a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-links a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #8888aa;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: #e0e0e8;
+    }
+
+    .nav-cta {
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      background: linear-gradient(135deg, #7aa2f7, #5d8ce6);
+      color: #fff !important;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(122, 162, 247, 0.4);
+    }
+
+    /* ─── Hero ─────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+    }
+
+    .hero-content {
+      max-width: 800px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: rgba(122, 162, 247, 0.1);
+      border: 1px solid rgba(122, 162, 247, 0.2);
+      color: #7aa2f7;
+      margin-bottom: 24px;
+    }
+
+    .badge .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #9ece6a;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #e0e0e8 0%, #7aa2f7 50%, #9ece6a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: #8888aa;
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7aa2f7, #5d8ce6);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(122, 162, 247, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(122, 162, 247, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e0e0e8;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #7aa2f7;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #8888aa;
+      margin-top: 4px;
+    }
+
+    /* ─── Features ─────────────────────────────────── */
+    .features {
+      padding: 100px 24px;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #7aa2f7;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      text-align: center;
+      color: #8888aa;
+      max-width: 560px;
+      margin: 0 auto 60px;
+      font-size: 1.05rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      background: rgba(30, 30, 46, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 32px;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    .feature-card:hover {
+      border-color: rgba(122, 162, 247, 0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    .fi-blue {
+      background: rgba(122, 162, 247, 0.15);
+    }
+
+    .fi-green {
+      background: rgba(158, 206, 106, 0.15);
+    }
+
+    .fi-purple {
+      background: rgba(187, 154, 247, 0.15);
+    }
+
+    .fi-yellow {
+      background: rgba(224, 175, 104, 0.15);
+    }
+
+    .fi-red {
+      background: rgba(247, 118, 142, 0.15);
+    }
+
+    .fi-teal {
+      background: rgba(115, 218, 202, 0.15);
+    }
+
+    .feature-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      color: #8888aa;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* ─── Formats ──────────────────────────────────── */
+    .formats {
+      padding: 100px 24px;
+    }
+
+    .format-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .format-tag {
+      padding: 8px 18px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: rgba(30, 30, 46, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s;
+    }
+
+    .format-tag:hover {
+      border-color: rgba(122, 162, 247, 0.3);
+      background: rgba(122, 162, 247, 0.08);
+    }
+
+    .ft-img {
+      color: #7aa2f7;
+    }
+
+    .ft-vid {
+      color: #f7768e;
+    }
+
+    .ft-aud {
+      color: #e0af68;
+    }
+
+    .ft-doc {
+      color: #9ece6a;
+    }
+
+    .ft-arc {
+      color: #bb9af7;
+    }
+
+    .ft-sys {
+      color: #73daca;
+    }
+
+    /* ─── Download ─────────────────────────────────── */
+    .download {
+      padding: 100px 24px;
+    }
+
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .dl-card {
+      background: rgba(30, 30, 46, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 36px;
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dl-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+
+    .dl-card:hover {
+      border-color: rgba(122, 162, 247, 0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+    }
+
+    .dl-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .dl-card h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .dl-card .dl-version {
+      color: #8888aa;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+    }
+
+    .dl-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .dl-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      background: rgba(122, 162, 247, 0.1);
+      border: 1px solid rgba(122, 162, 247, 0.2);
+      color: #7aa2f7;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .dl-btn:hover {
+      background: rgba(122, 162, 247, 0.2);
+    }
+
+    .dl-btn-primary {
+      background: linear-gradient(135deg, #7aa2f7, #5d8ce6);
+      color: #fff;
+      border: none;
+    }
+
+    .dl-btn-primary:hover {
+      box-shadow: 0 4px 20px rgba(122, 162, 247, 0.4);
+    }
+
+    .dl-card .dl-size {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 12px;
+    }
+
+    /* ─── How It Works ─────────────────────────────── */
+    .howitworks {
+      padding: 100px 24px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 32px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .step {
+      text-align: center;
+      padding: 24px;
+    }
+
+    .step-num {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, rgba(122, 162, 247, 0.2), rgba(158, 206, 106, 0.2));
+      border: 2px solid rgba(122, 162, 247, 0.3);
+      color: #7aa2f7;
+    }
+
+    .step h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      color: #8888aa;
+      font-size: 0.85rem;
+    }
+
+    .step-arrow {
+      display: none;
+      align-self: center;
+      color: #333;
+      font-size: 1.5rem;
+    }
+
+    /* ─── Filesystems ──────────────────────────────── */
+    .filesystems {
+      padding: 80px 24px;
+    }
+
+    .fs-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .fs-tag {
+      padding: 10px 22px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: rgba(30, 30, 46, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: #73daca;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    /* ─── CTA ──────────────────────────────────────── */
+    .cta {
+      padding: 120px 24px;
+      text-align: center;
+    }
+
+    .cta-box {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 64px 48px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(122, 162, 247, 0.08), rgba(158, 206, 106, 0.05));
+      border: 1px solid rgba(122, 162, 247, 0.15);
+    }
+
+    .cta-box h2 {
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .cta-box p {
+      color: #8888aa;
+      margin-bottom: 32px;
+      font-size: 1.05rem;
+    }
+
+    /* ─── Footer ───────────────────────────────────── */
+    footer {
+      padding: 40px 24px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #444;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    footer a {
+      color: #7aa2f7;
+    }
+
+    /* ─── Responsive ───────────────────────────────── */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero-stats {
+        flex-direction: column;
+        gap: 24px;
+      }
+
+    }
+
+    /* ─── Scroll reveal ────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s, transform 0.7s;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── Sidebar AdSense ──────────────────────────── */
+    .side-ad {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+      width: 160px;
+    }
+
+    .side-ad-left {
+      left: 8px;
+    }
+
+    .side-ad-right {
+      right: 8px;
+    }
+
+    .side-ad-inner {
+      background: rgba(30, 30, 46, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .side-ad-inner .ad-label {
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .side-ad-inner ins {
+      background: transparent !important;
+    }
+
+    /* Placeholder shown when AdSense hasn't loaded */
+    .ad-placeholder {
+      width: 140px;
+      height: 400px;
+      background: linear-gradient(180deg, rgba(122, 162, 247, 0.06) 0%, rgba(158, 206, 106, 0.06) 100%);
+      border: 1px dashed rgba(122, 162, 247, 0.15);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 0 auto;
+      color: #444;
+      font-size: 0.7rem;
+    }
+
+    .ad-placeholder-icon {
+      font-size: 1.5rem;
+      opacity: 0.5;
+    }
+
+    .ad-placeholder span {
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* Hide sidebar ads on narrow screens */
+    @media (max-width: 1200px) {
+      .side-ad {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Background glow -->
+  <div class="bg-glow">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <!-- Sidebar Ad — Left -->
+  <div class="side-ad side-ad-left">
+    <div class="side-ad-inner">
+      <div class="ad-label">Ad</div>
+      <div class="ad-slot" id="ad-left">
+        <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px"
+          data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins>
+      </div>
+      <div class="ad-placeholder" id="ad-left-placeholder">
+        <div class="ad-placeholder-icon">📢</div>
+        <span>Ad Space</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar Ad — Right -->
+  <div class="side-ad side-ad-right">
+    <div class="side-ad-inner">
+      <div class="ad-label">Ad</div>
+      <div class="ad-slot" id="ad-right">
+        <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px"
+          data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins>
+      </div>
+      <div class="ad-placeholder" id="ad-right-placeholder">
+        <div class="ad-placeholder-icon">📢</div>
+        <span>Ad Space</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="container">
+      <a href="#" class="logo">
+        <div class="logo-icon">🔧</div>
+        IronRod
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="tutorial.html">Tutorial</a>
+        <a href="#howitworks">How It Works</a>
+        <a href="#formats">Formats</a>
+        <a href="#download" class="nav-cta">Download Free</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="badge"><span class="pulse"></span> v1.0 — 100% Free Forever</div>
+      <h1>Recover What<br>Was Lost</h1>
+      <p>Powerful data recovery that scans raw disk sectors to find your deleted photos, videos, documents, and more —
+        even when the filesystem says they're gone.</p>
+      <div class="hero-buttons">
+        <a href="#download" class="btn btn-primary">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Download for Free
+        </a>
+        <a href="#features" class="btn btn-secondary">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 16 16 12 12 8" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+          </svg>
+          Learn More
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">95+</div>
+          <div class="stat-label">File Types</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">12+</div>
+          <div class="stat-label">Filesystems</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Platforms</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Read-Only Safe</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="container reveal">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Built for real recovery</h2>
+      <p class="section-sub">Not a toy. IronRod uses the same raw-sector forensic techniques used by professional data
+        recovery labs.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon fi-blue">⛏</div>
+          <h3>Raw Binary Carving</h3>
+          <p>Scans every byte of the disk for file signatures — works even when the filesystem is destroyed, formatted,
+            or corrupted.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon fi-green">🔬</div>
+          <h3>Forensic Mode</h3>
+          <p>Parses filesystem allocation bitmaps (exFAT, FAT32, NTFS, ext4) to scan only unallocated clusters — faster
+            and more accurate.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon fi-purple">🔍</div>
+          <h3>TSK Integration</h3>
+          <p>Uses The Sleuth Kit for filesystem-level recovery — recovers files with their original names, sizes, and
+            directory paths.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon fi-yellow">⚡</div>
+          <h3>High Performance</h3>
+          <p>Memory-mapped I/O, empty-block skipping, multiprocessing, and smart scanning deliver speeds over 200 MB/s.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon fi-red">🛡️</div>
+          <h3>SSD + TRIM Detection</h3>
+          <p>Detects SSDs with TRIM enabled and warns you before wasting time — no software can recover TRIM'd data.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon fi-teal">🔧</div>
+          <h3>Auto-Repair</h3>
+          <p>Automatically repairs damaged recovered files — fixes truncated JPEGs, broken MP4 headers, corrupted PNGs,
+            and more.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="howitworks" id="howitworks">
+    <div class="container reveal">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-title">Four steps to recovery</h2>
+      <p class="section-sub">Select your drive, hit scan, and let IronRod do the rest.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Select Drive</h3>
+          <p>Pick any connected storage — SSD, HDD, USB, SD card, or even a disk image file.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>Deep Scan</h3>
+          <p>IronRod reads raw sectors in read-only mode, searching for 95+ file signatures byte-by-byte.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>Verify &amp; Repair</h3>
+          <p>Each file is validated for structural integrity. Damaged files are automatically repaired when possible.
+          </p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <h3>Save Files</h3>
+          <p>Preview recovered files, select the ones you want, and save them to any location.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Supported Formats -->
+  <section class="formats" id="formats">
+    <div class="container reveal">
+      <div class="section-label">Supported Formats</div>
+      <h2 class="section-title">95+ file types</h2>
+      <p class="section-sub">From photos and videos to documents, databases, and system files.</p>
+      <div class="format-grid">
+        <span class="format-tag ft-img">🖼️ JPEG</span>
+        <span class="format-tag ft-img">🖼️ PNG</span>
+        <span class="format-tag ft-img">🖼️ HEIC</span>
+        <span class="format-tag ft-img">🖼️ GIF</span>
+        <span class="format-tag ft-img">🖼️ BMP</span>
+        <span class="format-tag ft-img">🖼️ TIFF</span>
+        <span class="format-tag ft-img">🖼️ WebP</span>
+        <span class="format-tag ft-img">🖼️ PSD</span>
+        <span class="format-tag ft-img">🖼️ RAW/CR2/NEF</span>
+        <span class="format-tag ft-vid">🎬 MP4</span>
+        <span class="format-tag ft-vid">🎬 MOV</span>
+        <span class="format-tag ft-vid">🎬 AVI</span>
+        <span class="format-tag ft-vid">🎬 MKV</span>
+        <span class="format-tag ft-vid">🎬 WebM</span>
+        <span class="format-tag ft-vid">🎬 FLV</span>
+        <span class="format-tag ft-vid">🎬 3GP</span>
+        <span class="format-tag ft-aud">🎵 MP3</span>
+        <span class="format-tag ft-aud">🎵 WAV</span>
+        <span class="format-tag ft-aud">🎵 FLAC</span>
+        <span class="format-tag ft-aud">🎵 AAC</span>
+        <span class="format-tag ft-aud">🎵 OGG</span>
+        <span class="format-tag ft-doc">📄 PDF</span>
+        <span class="format-tag ft-doc">📄 DOCX</span>
+        <span class="format-tag ft-doc">📄 XLSX</span>
+        <span class="format-tag ft-doc">📄 PPTX</span>
+        <span class="format-tag ft-arc">📦 ZIP</span>
+        <span class="format-tag ft-arc">📦 RAR</span>
+        <span class="format-tag ft-arc">📦 7Z</span>
+        <span class="format-tag ft-arc">📦 TAR.GZ</span>
+        <span class="format-tag ft-sys">🗄️ SQLite</span>
+        <span class="format-tag ft-sys">⚙️ EXE</span>
+        <span class="format-tag ft-sys">⚙️ ELF</span>
+        <span class="format-tag ft-sys">🔤 TTF/OTF</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filesystems -->
+  <section class="filesystems">
+    <div class="container reveal">
+      <div class="section-label">Filesystems</div>
+      <h2 class="section-title">Works on any filesystem</h2>
+      <p class="section-sub">Forensic mode parses allocation bitmaps. Brute-force mode works even without a filesystem.
+      </p>
+      <div class="fs-grid">
+        <span class="fs-tag">exFAT</span>
+        <span class="fs-tag">FAT32</span>
+        <span class="fs-tag">FAT16</span>
+        <span class="fs-tag">NTFS</span>
+        <span class="fs-tag">ext2/3/4</span>
+        <span class="fs-tag">HFS+</span>
+        <span class="fs-tag">APFS</span>
+        <span class="fs-tag">Btrfs</span>
+        <span class="fs-tag">XFS</span>
+        <span class="fs-tag">F2FS</span>
+        <span class="fs-tag">UDF</span>
+        <span class="fs-tag">ISO 9660</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download -->
+  <section class="download" id="download">
+    <div class="container reveal">
+      <div class="section-label">Download</div>
+      <h2 class="section-title">Get IronRod</h2>
+      <p class="section-sub">Completely free. No sign-up, no paywall, no limits.</p>
+      <div class="download-grid">
+
+        <!-- macOS -->
+        <div class="dl-card" style="--accent: #7aa2f7;">
+          <div class="dl-icon">🍎</div>
+          <h3>macOS</h3>
+          <div class="dl-version">v1.0 · Intel &amp; Apple Silicon</div>
+          <div class="dl-options">
+            <a href="https://github.com/ironrod/ironrod/releases/latest/download/IronRod-1.0-macOS-x86_64.dmg"
+              class="dl-btn dl-btn-primary">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download DMG (Intel)
+            </a>
+            <a href="https://github.com/ironrod/ironrod/releases/latest/download/IronRod-1.0-macOS-arm64.dmg"
+              class="dl-btn">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download DMG (Apple Silicon)
+            </a>
+          </div>
+          <div class="dl-size">~21 MB · macOS 10.15+</div>
+        </div>
+
+        <!-- Windows -->
+        <div class="dl-card" style="--accent: #9ece6a;">
+          <div class="dl-icon">🪟</div>
+          <h3>Windows</h3>
+          <div class="dl-version">v1.0 · Windows 10/11 64-bit</div>
+          <div class="dl-options">
+            <a href="https://github.com/ironrod/ironrod/releases/latest/download/IronRod-1.0-Windows-Setup.exe"
+              class="dl-btn dl-btn-primary">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download Installer (.exe)
+            </a>
+            <a href="https://github.com/ironrod/ironrod/releases/latest/download/IronRod-1.0-Windows-Portable.zip"
+              class="dl-btn">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Portable ZIP (no install)
+            </a>
+          </div>
+          <div class="dl-size">~25 MB · Run as Administrator</div>
+        </div>
+
+        <!-- Linux -->
+        <div class="dl-card" style="--accent: #bb9af7;">
+          <div class="dl-icon">🐧</div>
+          <h3>Linux</h3>
+          <div class="dl-version">v1.0 · x86_64</div>
+          <div class="dl-options">
+            <a href="https://github.com/ironrod/ironrod/releases/latest/download/IronRod-1.0-Linux-x86_64.AppImage"
+              class="dl-btn dl-btn-primary">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download AppImage
+            </a>
+            <a href="https://github.com/ironrod/ironrod/releases/latest/download/ironrod_1.0_amd64.deb" class="dl-btn">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Debian/Ubuntu (.deb)
+            </a>
+            <a href="https://github.com/ironrod/ironrod/releases/latest/download/IronRod-1.0-Linux-x86_64.tar.gz"
+              class="dl-btn">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Portable .tar.gz
+            </a>
+          </div>
+          <div class="dl-size">~30 MB · Requires sudo</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container reveal">
+      <div class="cta-box">
+        <h2>Your files aren't gone<br>until they're overwritten.</h2>
+        <p>Every second counts. Stop using the drive and start recovering now.</p>
+        <div class="hero-buttons">
+          <a href="#download" class="btn btn-primary">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Download Now
+          </a>
+          <a href="#features" class="btn btn-secondary">
+            ✨ Explore Features
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>© 2026 IronRod. Free to use — no hidden costs, ever.</p>
+      <p style="margin-top: 8px;">🔒 Read-only — your source drive is never modified.</p>
+    </div>
+  </footer>
+
+  <!-- Scroll reveal -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // AdSense: try to push ads, hide placeholder if ad loads
+    try {
+      (adsbygoogle = window.adsbygoogle || []).push({});
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) { }
+
+    // After a short delay, check if ads loaded — if not, keep placeholders visible
+    setTimeout(() => {
+      ['ad-left', 'ad-right'].forEach(id => {
+        const slot = document.getElementById(id);
+        const ph = document.getElementById(id + '-placeholder');
+        if (slot && ph) {
+          const ins = slot.querySelector('ins');
+          // If AdSense filled the ad (it gets a height > 0), hide placeholder
+          if (ins && ins.offsetHeight > 0 && ins.dataset.adStatus === 'filled') {
+            ph.style.display = 'none';
+          } else {
+            // AdSense didn't load — hide the empty ins, show placeholder
+            slot.style.display = 'none';
+            ph.style.display = 'flex';
+          }
+        }
+      });
+    }, 3000);
+  </script>
+
+</body>
+
+</html>

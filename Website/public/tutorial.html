@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tutorial — IronRod Data Recovery</title>
+    <meta name="description"
+        content="Step-by-step guide on how to use IronRod to recover deleted files from any storage device.">
+    <meta name="theme-color" content="#0f0f1a">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a14;
+            color: #e0e0e8;
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* ─── Background ─── */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-glow .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.18;
+        }
+
+        .bg-glow .orb:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            background: #7aa2f7;
+            top: -10%;
+            left: -5%;
+        }
+
+        .bg-glow .orb:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: #9ece6a;
+            bottom: -15%;
+            right: -10%;
+        }
+
+        /* ─── Navbar ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            background: rgba(10, 10, 20, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(122, 162, 247, 0.1);
+        }
+
+        nav .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #7aa2f7, #9ece6a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #8888aa;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #e0e0e8;
+        }
+
+        .nav-cta {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            background: linear-gradient(135deg, #7aa2f7, #5d8ce6);
+            color: #fff !important;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(122, 162, 247, 0.4);
+        }
+
+        /* ─── Container ─── */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ─── Page Header ─── */
+        .page-header {
+            padding: 140px 24px 60px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #e0e0e8 0%, #7aa2f7 50%, #9ece6a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .page-header p {
+            color: #8888aa;
+            font-size: 1.15rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ─── Table of Contents ─── */
+        .toc {
+            max-width: 700px;
+            margin: 0 auto 60px;
+            background: rgba(30, 30, 46, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 32px 36px;
+        }
+
+        .toc h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #7aa2f7;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+        }
+
+        .toc ol {
+            list-style: none;
+            counter-reset: toc-counter;
+        }
+
+        .toc ol li {
+            counter-increment: toc-counter;
+            margin-bottom: 10px;
+        }
+
+        .toc ol li a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #c0c0d0;
+            font-weight: 500;
+            transition: color 0.2s, transform 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .toc ol li a:hover {
+            color: #7aa2f7;
+            transform: translateX(4px);
+        }
+
+        .toc ol li a::before {
+            content: counter(toc-counter);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: rgba(122, 162, 247, 0.12);
+            color: #7aa2f7;
+            flex-shrink: 0;
+        }
+
+        /* ─── Tutorial Content ─── */
+        .tutorial {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+
+        .tutorial-step {
+            margin-bottom: 64px;
+            scroll-margin-top: 80px;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, rgba(122, 162, 247, 0.2), rgba(158, 206, 106, 0.15));
+            border: 2px solid rgba(122, 162, 247, 0.3);
+            color: #7aa2f7;
+            flex-shrink: 0;
+        }
+
+        .step-header h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .step-body {
+            padding-left: 64px;
+        }
+
+        .step-body p {
+            color: #b0b0c8;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .step-body strong {
+            color: #e0e0e8;
+        }
+
+        /* ─── Info boxes ─── */
+        .info-box {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            display: flex;
+            gap: 12px;
+        }
+
+        .info-box .info-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .info-tip {
+            background: rgba(122, 162, 247, 0.08);
+            border: 1px solid rgba(122, 162, 247, 0.15);
+            color: #a0b8e8;
+        }
+
+        .info-warn {
+            background: rgba(224, 175, 104, 0.08);
+            border: 1px solid rgba(224, 175, 104, 0.15);
+            color: #d4c090;
+        }
+
+        .info-danger {
+            background: rgba(247, 118, 142, 0.08);
+            border: 1px solid rgba(247, 118, 142, 0.15);
+            color: #e0a0a8;
+        }
+
+        .info-success {
+            background: rgba(158, 206, 106, 0.08);
+            border: 1px solid rgba(158, 206, 106, 0.15);
+            color: #b0d8a0;
+        }
+
+        /* ─── Code blocks ─── */
+        .code-block {
+            background: #16161e;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 16px 20px;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+            color: #9ece6a;
+            margin: 12px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block .code-label {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 0.65rem;
+            color: #555;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .code-block .t-dim {
+            color: #555;
+        }
+
+        .code-block .t-blue {
+            color: #7aa2f7;
+        }
+
+        .code-block .t-yellow {
+            color: #e0af68;
+        }
+
+        /* ─── Feature list ─── */
+        .check-list {
+            list-style: none;
+            margin: 12px 0;
+        }
+
+        .check-list li {
+            padding: 6px 0;
+            color: #b0b0c8;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .check-list li::before {
+            content: '✅';
+            flex-shrink: 0;
+        }
+
+        /* ─── OS Tabs ─── */
+        .os-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .os-tab {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #8888aa;
+            transition: all 0.2s;
+        }
+
+        .os-tab:hover {
+            border-color: rgba(122, 162, 247, 0.2);
+            color: #c0c0d0;
+        }
+
+        .os-tab.active {
+            background: rgba(122, 162, 247, 0.15);
+            border-color: rgba(122, 162, 247, 0.4);
+            color: #7aa2f7;
+        }
+
+        .os-content {
+            display: none;
+        }
+
+        .os-content.active {
+            display: block;
+        }
+
+        /* ─── Divider ─── */
+        .section-divider {
+            border: none;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.04);
+            margin: 48px 0;
+        }
+
+        /* ─── FAQ ─── */
+        .faq {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+
+        .faq h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .faq-item {
+            background: rgba(30, 30, 46, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .faq-q {
+            padding: 18px 24px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .faq-q:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .faq-q .faq-arrow {
+            transition: transform 0.3s;
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .faq-item.open .faq-q .faq-arrow {
+            transform: rotate(180deg);
+        }
+
+        .faq-a {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s;
+            padding: 0 24px;
+            color: #8888aa;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .faq-item.open .faq-a {
+            max-height: 500px;
+            padding: 0 24px 18px;
+        }
+
+        /* ─── Back to top ─── */
+        .back-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(122, 162, 247, 0.15);
+            border: 1px solid rgba(122, 162, 247, 0.25);
+            color: #7aa2f7;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .back-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .back-top:hover {
+            transform: translateY(-2px);
+            background: rgba(122, 162, 247, 0.25);
+        }
+
+        /* ─── Footer ─── */
+        footer {
+            padding: 40px 24px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #444;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            position: relative;
+            z-index: 1;
+        }
+
+        footer a {
+            color: #7aa2f7;
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .step-body {
+                padding-left: 0;
+                margin-top: 12px;
+            }
+
+            .os-tabs {
+                flex-wrap: wrap;
+            }
+
+            .toc {
+                padding: 24px 20px;
+            }
+        }
+
+        /* ─── Scroll reveal ─── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s, transform 0.6s;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-glow">
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">🔧</div>
+                IronRod
+            </a>
+            <div class="nav-links">
+                <a href="index.html#features">Features</a>
+                <a href="tutorial.html" style="color: #7aa2f7;">Tutorial</a>
+                <a href="index.html#formats">Formats</a>
+                <a href="index.html#download" class="nav-cta">Download Free</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>How to Use IronRod</h1>
+            <p>A complete step-by-step guide to recovering your deleted files — from installation to saving recovered
+                data.</p>
+        </div>
+    </section>
+
+    <!-- Table of Contents -->
+    <div class="container">
+        <div class="toc reveal">
+            <h3>📑 Table of Contents</h3>
+            <ol>
+                <li><a href="#step-install">Download &amp; Install</a></li>
+                <li><a href="#step-launch">Launch with Admin Privileges</a></li>
+                <li><a href="#step-select">Select Your Drive</a></li>
+                <li><a href="#step-categories">Choose File Categories</a></li>
+                <li><a href="#step-scan">Start the Scan</a></li>
+                <li><a href="#step-review">Review Recovered Files</a></li>
+                <li><a href="#step-save">Save Your Files</a></li>
+                <li><a href="#step-cli">Using CLI Mode</a></li>
+                <li><a href="#step-tips">Pro Tips</a></li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Tutorial Steps -->
+    <div class="container">
+        <div class="tutorial">
+
+            <!-- Step 1: Install -->
+            <div class="tutorial-step reveal" id="step-install">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h2>Download &amp; Install</h2>
+                </div>
+                <div class="step-body">
+                    <p>Download the latest version of IronRod for your operating system from the <a
+                            href="index.html#download" style="color: #7aa2f7; text-decoration: underline;">download
+                            page</a>.</p>
+
+                    <div class="os-tabs" data-group="install">
+                        <div class="os-tab active" data-os="mac">🍎 macOS</div>
+                        <div class="os-tab" data-os="win">🪟 Windows</div>
+                        <div class="os-tab" data-os="linux">🐧 Linux</div>
+                    </div>
+
+                    <div class="os-content active" data-group="install" data-os="mac">
+                        <p><strong>Option A — DMG Installer:</strong></p>
+                        <ul class="check-list">
+                            <li>Download the <strong>.dmg</strong> file (Intel or Apple Silicon)</li>
+                            <li>Double-click to mount the disk image</li>
+                            <li>Drag <strong>IronRod.app</strong> into your Applications folder</li>
+                            <li>On first launch, right-click → <strong>Open</strong> to bypass Gatekeeper</li>
+                        </ul>
+                    </div>
+
+                    <div class="os-content" data-group="install" data-os="win">
+                        <p><strong>Option A — Installer (.exe):</strong></p>
+                        <ul class="check-list">
+                            <li>Download the <strong>Setup.exe</strong> installer</li>
+                            <li>Run the installer and follow the wizard</li>
+                            <li>IronRod will be added to Start Menu &amp; Desktop</li>
+                        </ul>
+                        <p><strong>Option B — Portable:</strong></p>
+                        <ul class="check-list">
+                            <li>Download the <strong>Portable ZIP</strong></li>
+                            <li>Extract anywhere and run <strong>IronRod.exe</strong> — no installation needed</li>
+                        </ul>
+                    </div>
+
+                    <div class="os-content" data-group="install" data-os="linux">
+                        <p><strong>Option A — AppImage:</strong></p>
+                        <div class="code-block">
+                            <span class="code-label">Terminal</span>
+                            chmod +x IronRod-1.0-Linux-x86_64.AppImage<br>
+                            ./IronRod-1.0-Linux-x86_64.AppImage
+                        </div>
+                        <p><strong>Option B — Debian/Ubuntu (.deb):</strong></p>
+                        <div class="code-block">
+                            <span class="code-label">Terminal</span>
+                            sudo dpkg -i ironrod_1.0_amd64.deb
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Launch -->
+            <div class="tutorial-step reveal" id="step-launch">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h2>Launch with Admin Privileges</h2>
+                </div>
+                <div class="step-body">
+                    <p>IronRod needs <strong>administrator / root access</strong> to read raw disk sectors. Without it,
+                        the app cannot access deleted file data.</p>
+
+                    <div class="info-box info-warn">
+                        <span class="info-icon">⚠️</span>
+                        <div>Admin access is required for <strong>raw disk reading only</strong>. IronRod never writes
+                            to your source drive — it's 100% read-only and safe.</div>
+                    </div>
+
+                    <div class="os-tabs" data-group="launch">
+                        <div class="os-tab active" data-os="mac">🍎 macOS</div>
+                        <div class="os-tab" data-os="win">🪟 Windows</div>
+                        <div class="os-tab" data-os="linux">🐧 Linux</div>
+                    </div>
+
+                    <div class="os-content active" data-group="launch" data-os="mac">
+                        <p>The macOS app <strong>automatically requests admin privileges</strong> on launch — a Terminal
+                            window will open asking for your password.</p>
+                        <p>Alternatively, run from Terminal:</p>
+                        <div class="code-block">
+                            <span class="code-label">Terminal</span>
+                            sudo /Applications/IronRod.app/Contents/MacOS/IronRod
+                        </div>
+                    </div>
+
+                    <div class="os-content" data-group="launch" data-os="win">
+                        <p>Right-click <strong>IronRod.exe</strong> → <strong>Run as Administrator</strong>.</p>
+                        <p>Or right-click the Desktop shortcut → Properties → Advanced → check <strong>"Run as
+                                administrator"</strong>.</p>
+                    </div>
+
+                    <div class="os-content" data-group="launch" data-os="linux">
+                        <div class="code-block">
+                            <span class="code-label">Terminal</span>
+                            sudo ./IronRod-1.0-Linux-x86_64.AppImage
+                        </div>
+                        <p>Or if installed via .deb:</p>
+                        <div class="code-block">
+                            <span class="code-label">Terminal</span>
+                            sudo ironrod
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Select Drive -->
+            <div class="tutorial-step reveal" id="step-select">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h2>Select Your Drive</h2>
+                </div>
+                <div class="step-body">
+                    <p>In the <strong>left sidebar</strong>, you'll see a <strong>📀 Select Drive</strong> dropdown
+                        listing all connected storage devices.</p>
+
+                    <ul class="check-list">
+                        <li>Click the dropdown to see all drives (HDD, SSD, USB, SD card, etc.)</li>
+                        <li>Each drive shows its name, size, and filesystem type</li>
+                        <li>The app auto-detects SSD vs HDD and warns about TRIM limitations</li>
+                        <li>Use the <strong>⟳</strong> button to refresh the drive list</li>
+                        <li>Use the <strong>📁</strong> button to open a disk image file (.img, .dd, .raw, .dmg)</li>
+                    </ul>
+
+                    <div class="info-box info-tip">
+                        <span class="info-icon">💡</span>
+                        <div><strong>Disk Images:</strong> You can also scan disk image files (forensic copies). Click
+                            the 📁 button and select a .img, .dd, .raw, or .dmg file.</div>
+                    </div>
+
+                    <div class="info-box info-danger">
+                        <span class="info-icon">🛑</span>
+                        <div><strong>IMPORTANT:</strong> Never select the drive where your OS is installed for recovery.
+                            Always recover from a <strong>different</strong> drive than where you're saving files.
+                            Writing to the same drive can permanently overwrite your deleted data.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Categories -->
+            <div class="tutorial-step reveal" id="step-categories">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <h2>Choose File Categories</h2>
+                </div>
+                <div class="step-body">
+                    <p>Below the drive selector, you'll see checkboxes for <strong>9 file categories</strong>. Toggle
+                        the types you want to recover:</p>
+
+                    <ul class="check-list">
+                        <li><strong>🖼️ Image</strong> — JPEG, PNG, HEIC, GIF, BMP, TIFF, WebP, PSD, RAW, CR2, NEF, etc.
+                        </li>
+                        <li><strong>🎬 Video</strong> — MP4, MOV, AVI, MKV, WebM, FLV, 3GP, MPEG, WMV, etc.</li>
+                        <li><strong>🎵 Audio</strong> — MP3, WAV, FLAC, AAC, OGG, WMA, M4A, etc.</li>
+                        <li><strong>📄 Document</strong> — PDF, DOCX, XLSX, PPTX, RTF, etc.</li>
+                        <li><strong>📦 Archive</strong> — ZIP, RAR, 7Z, TAR.GZ, GZIP, etc.</li>
+                        <li><strong>⚙️ Executable</strong> — EXE, ELF, Mach-O, DEX, etc.</li>
+                        <li><strong>🔤 Font</strong> — TTF, OTF, WOFF, etc.</li>
+                        <li><strong>🗄️ Database</strong> — SQLite, MySQL dumps, etc.</li>
+                        <li><strong>🔧 System</strong> — Registry, plist, XML config files, etc.</li>
+                    </ul>
+
+                    <div class="info-box info-tip">
+                        <span class="info-icon">⚡</span>
+                        <div><strong>Speed tip:</strong> Uncheck categories you don't need. Fewer categories means a
+                            faster scan, since the app won't look for those file signatures.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Scan -->
+            <div class="tutorial-step reveal" id="step-scan">
+                <div class="step-header">
+                    <div class="step-number">5</div>
+                    <h2>Start the Scan</h2>
+                </div>
+                <div class="step-body">
+                    <p>Click the <strong>⚡ Scan for Deleted Files</strong> button at the bottom of the sidebar.</p>
+
+                    <p>IronRod uses two scanning strategies automatically:</p>
+
+                    <ul class="check-list">
+                        <li><strong>Forensic Mode</strong> — Parses the filesystem's allocation bitmap to scan only
+                            unallocated (deleted) space. Faster and more accurate. Works on exFAT, FAT32, NTFS,
+                            ext2/3/4, and more.</li>
+                        <li><strong>Brute-Force Mode</strong> — Scans every sector of the disk byte-by-byte. Used when
+                            the filesystem is missing, corrupted, or unsupported. Works on any device.</li>
+                    </ul>
+
+                    <p>During the scan, you'll see:</p>
+                    <ul class="check-list">
+                        <li>A <strong>progress bar</strong> showing percentage complete</li>
+                        <li><strong>Scan speed</strong> in MB/s</li>
+                        <li><strong>ETA</strong> (estimated time remaining)</li>
+                        <li><strong>File count</strong> updating in real-time as files are found</li>
+                        <li><strong>Scan mode</strong> indicator (Forensic or Brute-Force)</li>
+                    </ul>
+
+                    <div class="info-box info-success">
+                        <span class="info-icon">🔒</span>
+                        <div>Your source drive is <strong>never modified</strong>. IronRod opens the device in read-only
+                            mode. It's safe to scan even if you're not sure it's the right drive.</div>
+                    </div>
+
+                    <p>You can <strong>⏹ Cancel</strong> the scan at any time. Files found so far will still be
+                        available.</p>
+                </div>
+            </div>
+
+            <!-- Step 6: Review -->
+            <div class="tutorial-step reveal" id="step-review">
+                <div class="step-header">
+                    <div class="step-number">6</div>
+                    <h2>Review Recovered Files</h2>
+                </div>
+                <div class="step-body">
+                    <p>After scanning, recovered files appear in two tabs:</p>
+
+                    <p><strong>📋 All Found</strong> — Every file the scanner detected, organized by category (Image,
+                        Video, etc.). Each file shows:</p>
+                    <ul class="check-list">
+                        <li>File type and extension</li>
+                        <li>Estimated file size</li>
+                        <li>Health status (✅ Healthy, ⚠️ Damaged, ❓ Unknown)</li>
+                        <li>Checkboxes to select/deselect files</li>
+                    </ul>
+
+                    <p><strong>✅ Workable Files</strong> — Only files that passed structural validation. These are the
+                        most likely to open correctly after saving.</p>
+
+                    <p>Use the <strong>filter bar</strong> at the top to narrow results by:</p>
+                    <ul class="check-list">
+                        <li><strong>Category</strong> — Image, Video, Audio, etc.</li>
+                        <li><strong>Extension</strong> — Specific file type (e.g., only JPEG)</li>
+                        <li><strong>Size range</strong> — Minimum and maximum file size</li>
+                        <li><strong>Health</strong> — Healthy, Damaged, or Unknown</li>
+                    </ul>
+
+                    <div class="info-box info-tip">
+                        <span class="info-icon">💡</span>
+                        <div><strong>Tip:</strong> Use "Select All" and "Select None" buttons to quickly manage your
+                            selection. Then uncheck individual files you don't want.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 7: Save -->
+            <div class="tutorial-step reveal" id="step-save">
+                <div class="step-header">
+                    <div class="step-number">7</div>
+                    <h2>Save Your Files</h2>
+                </div>
+                <div class="step-body">
+                    <p>Click the <strong>💾 Save Selected</strong> button to save your recovered files.</p>
+
+                    <ul class="check-list">
+                        <li>By default, files are saved to <strong>~/Desktop/RecoveredFiles</strong></li>
+                        <li>You can change the output directory before saving</li>
+                        <li>Files are organized into folders by category (Images/, Videos/, etc.)</li>
+                        <li>Damaged files are <strong>automatically repaired</strong> when possible (truncated JPEGs,
+                            broken MP4 headers, corrupted PNGs, etc.)</li>
+                    </ul>
+
+                    <div class="info-box info-danger">
+                        <span class="info-icon">🛑</span>
+                        <div><strong>CRITICAL:</strong> Never save recovered files to the <strong>same drive</strong>
+                            you're recovering from! This will overwrite the very data you're trying to recover. Always
+                            save to a different drive or disk.</div>
+                    </div>
+
+                    <div class="info-box info-success">
+                        <span class="info-icon">🔧</span>
+                        <div><strong>Auto-Repair:</strong> IronRod automatically attempts to fix damaged files during
+                            save. This includes repairing JPEG headers, fixing MP4/MOV atom structures, rebuilding PNG
+                            chunks, and more.</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- Step 8: CLI Mode -->
+            <div class="tutorial-step reveal" id="step-cli">
+                <div class="step-header">
+                    <div class="step-number">8</div>
+                    <h2>Using CLI Mode</h2>
+                </div>
+                <div class="step-body">
+                    <p>IronRod also supports a <strong>command-line interface</strong> for advanced users, scripting,
+                        and headless servers.</p>
+
+                    <div class="code-block">
+                        <span class="code-label">Terminal</span>
+                        <span class="t-dim">$</span> sudo ironrod <span class="t-blue">--cli</span> <span
+                            class="t-blue">-d</span> <span class="t-yellow">/dev/disk4</span>
+                    </div>
+
+                    <p><strong>CLI Options:</strong></p>
+                    <div class="code-block">
+                        <span class="code-label">Options</span>
+                        --cli &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Run in command-line
+                        mode (no GUI)<br>
+                        -d, --device &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Path to disk device or image file<br>
+                        -o, --output &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Output directory (default:
+                        ~/Desktop/RecoveredFiles)<br>
+                        -c, --categories &nbsp; Comma-separated list: Image,Video,Audio,Document<br>
+                        --no-elevate &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Skip auto-elevation (already running as root)
+                    </div>
+
+                    <p><strong>Examples:</strong></p>
+                    <div class="code-block">
+                        <span class="code-label">macOS / Linux</span>
+                        <span class="t-dim"># Scan a USB drive, recover only images and videos</span><br>
+                        sudo ironrod --cli -d /dev/sdb -c Image,Video<br><br>
+                        <span class="t-dim"># Scan a disk image file</span><br>
+                        sudo ironrod --cli -d ~/forensic-copy.dd -o ~/recovered<br><br>
+                        <span class="t-dim"># Scan with all defaults</span><br>
+                        sudo ironrod --cli -d /dev/disk2
+                    </div>
+
+                    <div class="code-block">
+                        <span class="code-label">Windows (Admin CMD)</span>
+                        IronRod.exe --cli -d \\.\PhysicalDrive1<br><br>
+                        <span class="t-dim">REM Scan a specific partition</span><br>
+                        IronRod.exe --cli -d E:
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 9: Tips -->
+            <div class="tutorial-step reveal" id="step-tips">
+                <div class="step-header">
+                    <div class="step-number">9</div>
+                    <h2>Pro Tips</h2>
+                </div>
+                <div class="step-body">
+
+                    <div class="info-box info-warn">
+                        <span class="info-icon">⏱️</span>
+                        <div><strong>Act fast!</strong> The sooner you scan after deletion, the better your chances.
+                            Every second the drive is in use, deleted data may be overwritten.</div>
+                    </div>
+
+                    <div class="info-box info-danger">
+                        <span class="info-icon">💽</span>
+                        <div><strong>SSDs with TRIM:</strong> Modern SSDs erase deleted data within seconds via TRIM.
+                            IronRod detects this and warns you. If TRIM has run, the data is physically gone — no
+                            software can recover it.</div>
+                    </div>
+
+                    <div class="info-box info-tip">
+                        <span class="info-icon">📋</span>
+                        <div><strong>Disk images:</strong> For critical recovery, create a full disk image first using
+                            <code
+                                style="color:#9ece6a; background:#16161e; padding:2px 6px; border-radius:4px;">dd</code>
+                            and scan the image instead. This preserves the original drive state.</div>
+                    </div>
+
+                    <div class="info-box info-success">
+                        <span class="info-icon">🎯</span>
+                        <div><strong>Best results:</strong> Use IronRod on an HDD (not SSD), scan immediately after
+                            deletion, and save to a completely different physical drive. This gives you the highest
+                            recovery rate.</div>
+                    </div>
+
+                    <div class="info-box info-tip">
+                        <span class="info-icon">📊</span>
+                        <div><strong>Large drives:</strong> For drives larger than 500 GB, uncheck file categories you
+                            don't need. This reduces scan time significantly. A 1 TB HDD can take 20-60 minutes for a
+                            full scan.</div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <hr class="section-divider" style="max-width: 800px; margin: 0 auto 60px;">
+
+    <!-- FAQ -->
+    <div class="container">
+        <div class="faq reveal">
+            <h2>Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+                <div class="faq-q">Is IronRod really free? <span class="faq-arrow">▼</span></div>
+                <div class="faq-a">Yes, 100% free. No trial limitations, no watermarks, no hidden costs. You can recover
+                    unlimited files from unlimited drives.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">Will IronRod damage my drive? <span class="faq-arrow">▼</span></div>
+                <div class="faq-a">No. IronRod opens your drive in strict read-only mode. It never writes a single byte
+                    to your source drive. It's completely safe to use.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">Why does it need admin/root access? <span class="faq-arrow">▼</span></div>
+                <div class="faq-a">Operating systems protect raw disk access behind admin privileges for security.
+                    IronRod needs this to read the raw sectors where deleted file data still exists. Without admin
+                    access, it can only see the normal filesystem which has already "forgotten" the deleted files.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">Can I recover files from an SSD? <span class="faq-arrow">▼</span></div>
+                <div class="faq-a">It depends. Modern SSDs use TRIM to erase deleted data within seconds. If TRIM has
+                    already run, the data is physically zeroed out — no software can recover it. IronRod will detect
+                    this and warn you. HDDs, USB drives, and SD cards don't have TRIM, so recovery is much more likely.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">What filesystems does it support? <span class="faq-arrow">▼</span></div>
+                <div class="faq-a">Forensic mode works on exFAT, FAT12/16/32, NTFS, ext2/3/4, HFS+, APFS, Btrfs, XFS,
+                    F2FS, UDF, and ISO 9660. Brute-force mode works on ANY device — even ones with no filesystem at all.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">Why are some recovered files corrupted? <span class="faq-arrow">▼</span></div>
+                <div class="faq-a">When a file is deleted, its disk space is marked as available. If new data was
+                    partially written over that space, the recovered file will be corrupted. IronRod detects this and
+                    marks files as "Damaged". It also attempts automatic repair for common formats (JPEG, MP4, PNG,
+                    etc.).</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">How long does a scan take? <span class="faq-arrow">▼</span></div>
+                <div class="faq-a">It depends on the drive size and type. Forensic mode scans only unallocated space,
+                    which is much faster. A 256 GB USB drive typically takes 5-15 minutes. A 2 TB HDD can take 30-90
+                    minutes. IronRod shows real-time speed and ETA during the scan.</div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Back to Top -->
+    <div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>© 2026 IronRod. Free to use — no hidden costs, ever.</p>
+            <p style="margin-top: 8px;">🔒 Read-only — your source drive is never modified.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // OS Tabs
+        document.querySelectorAll('.os-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const group = tab.parentElement.dataset.group;
+                const os = tab.dataset.os;
+                // Update active tab
+                tab.parentElement.querySelectorAll('.os-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                // Update content
+                document.querySelectorAll(`.os-content[data-group="${group}"]`).forEach(c => {
+                    c.classList.toggle('active', c.dataset.os === os);
+                });
+            });
+        });
+
+        // FAQ toggle
+        document.querySelectorAll('.faq-q').forEach(q => {
+            q.addEventListener('click', () => {
+                q.parentElement.classList.toggle('open');
+            });
+        });
+
+        // Back to top button
+        window.addEventListener('scroll', () => {
+            document.getElementById('backTop').classList.toggle('visible', window.scrollY > 400);
+        });
+    </script>
+
+</body>
+
+</html>
