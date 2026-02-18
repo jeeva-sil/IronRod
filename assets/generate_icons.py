@@ -16,6 +16,11 @@ import os
 import sys
 import struct
 
+# Fix Windows console encoding (cp1252 can't handle Unicode)
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+
 ASSETS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
