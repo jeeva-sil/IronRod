@@ -62,11 +62,7 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          if [ "${{ matrix.arch }}" = "arm64" ]; then
-            pyinstaller IronRod.spec --noconfirm --clean --target-arch arm64
-          else
-            pyinstaller IronRod.spec --noconfirm --clean --target-arch x86_64
-          fi
+          pyinstaller IronRod.spec --noconfirm --clean
 
       - name: Create DMG
         run: |
