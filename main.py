@@ -45,21 +45,49 @@ def _request_admin_privileges():
                 script = os.path.abspath(sys.argv[0])
                 parts = [python_exe, script] + sys.argv[1:] + ["--no-elevate"]
 
-            shell_cmd = " ".join(shlex.quote(p) for p in parts)
-
-            # Use AppleScript to open Terminal.app and run with sudo.
-            # This gives the elevated process full GUI + display access.
-            applescript = (
-                f'tell application "Terminal"\n'
-                f'    activate\n'
-                f'    do script "sudo {shell_cmd}; exit"\n'
-                f'end tell'
+            # Show native macOS password dialog
+            prompt_script = (
+                'display dialog '
+                '"IronRod needs administrator privileges to access disk devices." '
+                'default answer "" with hidden answer '
+                'buttons {"Cancel", "OK"} default button "OK" '
+                'with title "Authentication Required" '
+                'with icon caution'
             )
-
             try:
-                subprocess.Popen(["osascript", "-e", applescript])
+                result = subprocess.run(
+                    ["osascript", "-e", prompt_script],
+                    capture_output=True, text=True, timeout=120,
+                )
+            except (subprocess.TimeoutExpired, Exception):
+                print("Authentication timed out. Run with: sudo", " ".join(parts))
+                sys.exit(1)
+
+            if result.returncode != 0:
+                # User clicked Cancel
+                sys.exit(0)
+
+            # Parse password from "button returned:OK, text returned:<password>"
+            password = ""
+            for part in result.stdout.strip().split(", "):
+                if part.startswith("text returned:"):
+                    password = part[len("text returned:"):]
+                    break
+
+            # Re-launch with sudo -S, piping the password via stdin.
+            # This preserves the current display/GUI context.
+            try:
+                proc = subprocess.Popen(
+                    ["sudo", "-S"] + parts,
+                    stdin=subprocess.PIPE,
+                    env=os.environ.copy(),
+                )
+                proc.stdin.write((password + "\n").encode())
+                proc.stdin.flush()
+                proc.stdin.close()
+                proc.wait()
             except Exception:
-                # Fallback: just print instructions
+                shell_cmd = " ".join(shlex.quote(p) for p in parts)
                 print(f"Run with: sudo {shell_cmd}")
             sys.exit(0)
 

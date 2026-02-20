@@ -15,12 +15,126 @@ import sys
 import time
 import logging
 import platform
+import subprocess
 import threading
 import webbrowser
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from typing import Optional
 from collections import defaultdict
+
+
+def _request_admin_privileges():
+    """
+    Re-launch with admin privileges using native system prompts.
+    - macOS: native password dialog via osascript, then sudo -S to keep display
+    - Linux: pkexec graphical prompt, fallback to sudo
+    - Windows: UAC elevation via ShellExecute
+    Returns True if already running as admin, otherwise re-launches and exits.
+    """
+    _sys = platform.system()
+
+    if _sys in ("Darwin", "Linux"):
+        if os.geteuid() == 0:
+            return True  # Already root
+
+        if _sys == "Darwin":
+            import shlex
+
+            if getattr(sys, 'frozen', False):
+                app_exe = sys.executable
+                parts = [app_exe] + sys.argv[1:]
+            else:
+                python_exe = sys.executable
+                script = os.path.abspath(sys.argv[0])
+                parts = [python_exe, script] + sys.argv[1:]
+
+            # Show native macOS password dialog
+            prompt_script = (
+                'display dialog '
+                '"IronRod needs administrator privileges to access disk devices." '
+                'default answer "" with hidden answer '
+                'buttons {"Cancel", "OK"} default button "OK" '
+                'with title "Authentication Required" '
+                'with icon caution'
+            )
+            try:
+                result = subprocess.run(
+                    ["osascript", "-e", prompt_script],
+                    capture_output=True, text=True, timeout=120,
+                )
+            except (subprocess.TimeoutExpired, Exception):
+                print("Authentication timed out. Run with: sudo", " ".join(parts))
+                sys.exit(1)
+
+            if result.returncode != 0:
+                # User clicked Cancel
+                sys.exit(0)
+
+            # Parse password from "button returned:OK, text returned:<password>"
+            password = ""
+            for part in result.stdout.strip().split(", "):
+                if part.startswith("text returned:"):
+                    password = part[len("text returned:"):]
+                    break
+
+            # Re-launch with sudo -S, piping the password via stdin.
+            # This preserves the current display/GUI context.
+            try:
+                proc = subprocess.Popen(
+                    ["sudo", "-S"] + parts,
+                    stdin=subprocess.PIPE,
+                    env=os.environ.copy(),
+                )
+                proc.stdin.write((password + "\n").encode())
+                proc.stdin.flush()
+                proc.stdin.close()
+                proc.wait()
+            except Exception:
+                shell_cmd = " ".join(shlex.quote(p) for p in parts)
+                print(f"Run with: sudo {shell_cmd}")
+            sys.exit(0)
+
+        elif _sys == "Linux":
+            python_exe = sys.executable
+            script = os.path.abspath(sys.argv[0])
+            if getattr(sys, 'frozen', False):
+                exec_args = [sys.executable] + sys.argv[1:]
+            else:
+                exec_args = [python_exe, script] + sys.argv[1:]
+            for elevate_cmd in (["pkexec"], ["sudo"]):
+                try:
+                    os.execvp(elevate_cmd[0], elevate_cmd + exec_args)
+                except FileNotFoundError:
+                    continue
+            print("Could not elevate privileges. Run with: sudo", " ".join(exec_args))
+            sys.exit(1)
+
+    elif _sys == "Windows":
+        try:
+            import ctypes
+            if ctypes.windll.shell32.IsUserAnAdmin():
+                return True
+        except Exception:
+            return True
+        if getattr(sys, 'frozen', False):
+            exe = sys.executable
+            params = " ".join(sys.argv[1:])
+        else:
+            exe = sys.executable
+            params = f'"{os.path.abspath(sys.argv[0])}" ' + " ".join(sys.argv[1:])
+        try:
+            import ctypes
+            ctypes.windll.shell32.ShellExecuteW(None, "runas", exe, params, None, 1)
+        except Exception:
+            print("Admin privileges required. Right-click → Run as Administrator.")
+        sys.exit(0)
+
+    return True
+
+
+# Request admin before anything else
+_request_admin_privileges()
 
 # Configure logging so save/scan errors are visible in terminal
 logging.basicConfig(
@@ -79,7 +193,7 @@ DAMAGE_ICONS = {
 DONATE_PAYPAL       = "https://paypal.me/YOUR_PAYPAL"          # PayPal.me link
 DONATE_GITHUB       = "https://github.com/sponsors/YOUR_GITHUB" # GitHub Sponsors
 DONATE_KOFI         = "https://ko-fi.com/YOUR_KOFI"            # Ko-fi
-DONATE_BUYMEACOFFEE = "https://buymeacoffee.com/YOUR_NAME"     # Buy Me a Coffee
+DONATE_BUYMEACOFFEE = "https://buymeacoffee.com/jeevakannan"   # Buy Me a Coffee
 
 
 class DataRecoveryApp:
@@ -263,7 +377,7 @@ class DataRecoveryApp:
                    style="Status.TLabel")
         self._subtitle_lbl.pack(side=tk.LEFT, padx=(15, 0), pady=(8, 0))
         ttk.Button(tf, text="❤️  Donate",
-                   command=self._show_donation_dialog,
+                   command=lambda: webbrowser.open(DONATE_BUYMEACOFFEE),
                    style="DonateSm.TButton").pack(side=tk.RIGHT, padx=(0, 2))
 
         content = ttk.Frame(self.main_frame)
@@ -438,8 +552,8 @@ class DataRecoveryApp:
                    wraplength=self._sidebar_wrap).pack(anchor=tk.W, pady=(3, 8))
 
         ttk.Button(df, text="❤️  Donate / Support This Project",
-                    command=self._show_donation_dialog,
-                    style="Donate.TButton").pack(fill=tk.X, ipady=3)
+                command=lambda: webbrowser.open(DONATE_BUYMEACOFFEE),
+                style="Donate.TButton").pack(fill=tk.X, ipady=3)
 
     def _show_donation_dialog(self):
         """Modal dialog with multiple donation platform options."""
