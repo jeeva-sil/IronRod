@@ -56,7 +56,7 @@ $ErrorActionPreference = "Stop"
 # ── Configuration ─────────────────────────────────────────────
 $AppName       = "IronRod"
 $Version       = "1.0.0.0"
-$VersionShort  = "1.0"
+$VersionShort  = "1.0.6"
 $PublisherCN   = "CN=IronRod Team"
 $TimestampUrl  = "http://timestamp.digicert.com"
 

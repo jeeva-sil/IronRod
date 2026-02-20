@@ -6,7 +6,7 @@
 set -euo pipefail
 
 APP_NAME="IronRod"
-VERSION="1.0"
+VERSION="1.0.6"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILD_DIR="$PROJECT_DIR/dist"

@@ -8,7 +8,7 @@ disk images) across all major filesystems (exFAT, FAT12/16/32,
 NTFS, ext2/3/4, HFS+, APFS, Btrfs, XFS, F2FS, UDF, ISO 9660).
 """
 
-APP_VERSION = "1.0"
+APP_VERSION = "1.0.6"
 
 import os
 import sys

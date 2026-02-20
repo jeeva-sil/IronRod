@@ -480,6 +480,117 @@
       color: #73daca;
     }
 
+    /* ─── Interstitial Ad Overlay ───────────────────── */
+    .interstitial-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 20, 0.95);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 24px;
+      backdrop-filter: blur(8px);
+    }
+
+    .interstitial-overlay.active {
+      display: flex;
+    }
+
+    .interstitial-box {
+      background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3c 100%);
+      border: 1px solid rgba(122, 162, 247, 0.2);
+      border-radius: 20px;
+      padding: 40px 48px;
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+      animation: interstitialIn 0.3s ease-out;
+    }
+
+    @keyframes interstitialIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .interstitial-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #565f89;
+      margin-bottom: 12px;
+    }
+
+    .interstitial-ad-slot {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+
+    .interstitial-ad-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: #565f89;
+      font-size: 0.85rem;
+    }
+
+    .interstitial-ad-placeholder .ad-placeholder-icon {
+      font-size: 2rem;
+    }
+
+    .interstitial-timer {
+      font-size: 0.95rem;
+      color: #a9b1d6;
+      margin-top: 8px;
+    }
+
+    .interstitial-timer span {
+      color: #7aa2f7;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .interstitial-skip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      padding: 10px 28px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      opacity: 0.3;
+      pointer-events: none;
+      transition: all 0.3s;
+    }
+
+    .interstitial-skip.ready {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .interstitial-skip.ready:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(122, 162, 247, 0.4);
+    }
+
     /* ─── Download ─────────────────────────────────── */
     .download {
       padding: 100px 24px;
@@ -845,6 +956,10 @@
         <a href="tutorial.html">Tutorial</a>
         <a href="#howitworks">How It Works</a>
         <a href="#formats">Formats</a>
+        <a href="https://buymeacoffee.com/jeevasil" target="_blank" rel="noopener"
+          style="display:inline-flex;align-items:center;gap:5px;background:#ffdd00;color:#000;padding:6px 14px;border-radius:8px;font-weight:600;font-size:0.85rem;transition:transform 0.2s,box-shadow 0.2s;"
+          onmouseover="this.style.transform='scale(1.05)';this.style.boxShadow='0 4px 16px rgba(255,221,0,0.4)'"
+          onmouseout="this.style.transform='scale(1)';this.style.boxShadow='none'">☕ Buy Me a Coffee</a>
         <a href="#download" class="nav-cta">Download Free</a>
       </div>
     </div>
@@ -853,7 +968,7 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-content">
-      <div class="badge"><span class="pulse"></span> v1.0 — 100% Free Forever</div>
+      <div class="badge"><span class="pulse"></span> v1.0.6 — 100% Free Forever</div>
       <h1>Recover What<br>Was Lost</h1>
       <p>Powerful data recovery that scans raw disk sectors to find your deleted photos, videos, documents, and more —
         even when the filesystem says they're gone.</p>
@@ -1057,7 +1172,7 @@
         <div class="dl-card" style="--accent: #7aa2f7;">
           <div class="dl-icon">🍎</div>
           <h3>macOS</h3>
-          <div class="dl-version">v1.0 · Intel &amp; Apple Silicon</div>
+          <div class="dl-version">v1.0.6 · Intel &amp; Apple Silicon</div>
           <div class="dl-options">
             <a href="https://github.com/jeeva-sil/IronRod/releases/latest"
               class="dl-btn dl-btn-primary" target="_blank" rel="noopener">
@@ -1085,7 +1200,7 @@
         <div class="dl-card" style="--accent: #9ece6a;">
           <div class="dl-icon">🪟</div>
           <h3>Windows</h3>
-          <div class="dl-version">v1.0 · Windows 10/11 64-bit</div>
+          <div class="dl-version">v1.0.6 · Windows 10/11 64-bit</div>
           <div class="dl-options">
             <a href="https://github.com/jeeva-sil/IronRod/releases/latest"
               class="dl-btn dl-btn-primary" target="_blank" rel="noopener">
@@ -1104,7 +1219,7 @@
         <div class="dl-card" style="--accent: #bb9af7;">
           <div class="dl-icon">🐧</div>
           <h3>Linux</h3>
-          <div class="dl-version">v1.0 · x86_64</div>
+          <div class="dl-version">v1.0.6 · x86_64</div>
           <div class="dl-options">
             <a href="https://github.com/jeeva-sil/IronRod/releases/latest"
               class="dl-btn dl-btn-primary" target="_blank" rel="noopener">
@@ -1164,6 +1279,24 @@
     </div>
   </section>
 
+  <!-- Interstitial Ad Overlay -->
+  <div class="interstitial-overlay" id="interstitial">
+    <div class="interstitial-box">
+      <div class="interstitial-label">Sponsored</div>
+      <div class="interstitial-ad-slot" id="interstitial-ad">
+        <ins class="adsbygoogle" style="display:block; width:100%; min-height:250px;"
+          data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX"
+          data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <div class="interstitial-ad-placeholder" id="interstitial-placeholder">
+          <div class="ad-placeholder-icon">📢</div>
+          <span>Advertisement</span>
+        </div>
+      </div>
+      <div class="interstitial-timer">Download starts in <span id="countdown">5</span>s</div>
+      <button class="interstitial-skip" id="skip-btn" disabled>Continue to Download →</button>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer>
     <div class="container">
@@ -1201,6 +1334,73 @@
       (adsbygoogle = window.adsbygoogle || []).push({});
       (adsbygoogle = window.adsbygoogle || []).push({});
     } catch (e) { }
+
+    // Push interstitial ad
+    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) { }
+
+    // ─── Interstitial Ad on Download Click ─────────
+    const overlay = document.getElementById('interstitial');
+    const countdownEl = document.getElementById('countdown');
+    const skipBtn = document.getElementById('skip-btn');
+    let countdownTimer = null;
+    let pendingUrl = '';
+
+    function showInterstitial(url) {
+      pendingUrl = url;
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      skipBtn.classList.remove('ready');
+      skipBtn.disabled = true;
+
+      // Check if interstitial ad loaded, hide placeholder if so
+      setTimeout(() => {
+        const ins = document.querySelector('#interstitial-ad ins');
+        const ph = document.getElementById('interstitial-placeholder');
+        if (ins && ins.offsetHeight > 0 && ins.dataset.adStatus === 'filled') {
+          if (ph) ph.style.display = 'none';
+        }
+      }, 1000);
+
+      let seconds = 5;
+      countdownEl.textContent = seconds;
+      countdownTimer = setInterval(() => {
+        seconds--;
+        countdownEl.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(countdownTimer);
+          skipBtn.classList.add('ready');
+          skipBtn.disabled = false;
+        }
+      }, 1000);
+    }
+
+    function closeInterstitial() {
+      if (countdownTimer) clearInterval(countdownTimer);
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      if (pendingUrl) {
+        window.open(pendingUrl, '_blank', 'noopener');
+        pendingUrl = '';
+      }
+    }
+
+    skipBtn.addEventListener('click', closeInterstitial);
+
+    // Intercept all download button clicks
+    document.querySelectorAll('.dl-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        const url = btn.getAttribute('href');
+        if (url) showInterstitial(url);
+      });
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay.classList.contains('active') && !skipBtn.disabled) {
+        closeInterstitial();
+      }
+    });
 
     // After a short delay, check if ads loaded — if not, keep placeholders visible
     setTimeout(() => {

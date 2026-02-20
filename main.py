@@ -8,7 +8,7 @@ Usage:
     sudo python main.py --cli   # Terminal mode
 """
 
-APP_VERSION = "1.0"
+APP_VERSION = "1.0.6"
 
 import os
 import sys

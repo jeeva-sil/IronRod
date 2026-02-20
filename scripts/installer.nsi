@@ -7,7 +7,7 @@
 ;   makensis /DVERSION=1.0.0 /DOUTFILE="dist\IronRod-Setup.exe" scripts\installer.nsi
 
 !ifndef VERSION
-    !define VERSION "1.0"
+    !define VERSION "1.0.6"
 !endif
 !ifndef OUTFILE
     !define OUTFILE "dist\IronRod-${VERSION}-Windows-Setup.exe"

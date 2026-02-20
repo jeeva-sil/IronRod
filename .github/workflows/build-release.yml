@@ -15,7 +15,7 @@ on:
       version:
         description: 'Version number (e.g., 1.0.0)'
         required: true
-        default: '1.0.0'
+        default: '1.0.6'
 
 permissions:
   contents: write
@@ -27,9 +27,9 @@ env:
 
 jobs:
   # ════════════════════════════════════════════════════════════
-  # macOS — .app bundle + .dmg installer
+  # macOS (Apple Silicon) — .app bundle + .dmg installer
   # ════════════════════════════════════════════════════════════
-  build-macos:
+  build-macos-arm64:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -87,6 +87,69 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macos-arm64
+          path: dist/*.dmg
+
+  # ════════════════════════════════════════════════════════════
+  # macOS (Intel) — .app bundle + .dmg installer
+  # ════════════════════════════════════════════════════════════
+  build-macos-intel:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt || true
+          pip install -r requirements-build.txt
+
+      - name: Generate icons
+        run: python -X utf8 assets/generate_icons.py
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller IronRod.spec --noconfirm --clean
+
+      - name: Create DMG
+        run: |
+          brew install create-dmg || true
+          DMG_TEMP="dist/dmg_temp"
+          mkdir -p "$DMG_TEMP"
+          cp -R "dist/${{ env.APP_NAME }}.app" "$DMG_TEMP/"
+          ln -s /Applications "$DMG_TEMP/Applications"
+
+          create-dmg \
+            --volname "${{ env.APP_NAME }}" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --icon "${{ env.APP_NAME }}.app" 150 190 \
+            --app-drop-link 450 190 \
+            --no-internet-enable \
+            "dist/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-macOS-x86_64.dmg" \
+            "$DMG_TEMP/" \
+          || hdiutil create -volname "${{ env.APP_NAME }}" \
+               -srcfolder "$DMG_TEMP" -ov -format UDZO \
+               "dist/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-macOS-x86_64.dmg"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-x86_64
           path: dist/*.dmg
 
   # ════════════════════════════════════════════════════════════
@@ -302,7 +365,7 @@ jobs:
   # Create GitHub Release with all artifacts
   # ════════════════════════════════════════════════════════════
   release:
-    needs: [build-macos, build-windows, build-linux]
+    needs: [build-macos-arm64, build-macos-intel, build-windows, build-linux]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
