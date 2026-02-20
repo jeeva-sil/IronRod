@@ -1,0 +1,7 @@
+# Build artifacts are too large for git — deploy directly via Firebase
+*.dmg
+*.zip
+*.AppImage
+*.tar.gz
+*.deb
+*.exe

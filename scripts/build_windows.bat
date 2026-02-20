@@ -57,7 +57,16 @@ if exist "%APP_NAME%-%VERSION%-Windows-Portable.zip" del "%APP_NAME%-%VERSION%-W
 powershell -Command "Compress-Archive -Path '%APP_NAME%' -DestinationPath '%APP_NAME%-%VERSION%-Windows-Portable.zip' -Force"
 cd /d "%PROJECT_DIR%"
 
-REM ── 6. Summary ──
+REM ── 6. Build MSIX package (requires Windows SDK) ──
+echo 📦 Building MSIX package...
+powershell -ExecutionPolicy Bypass -File scripts\package_msix.ps1
+if %ERRORLEVEL% neq 0 (
+    echo ⚠  MSIX packaging failed or Windows SDK not found.
+    echo    Install Windows SDK: https://developer.microsoft.com/windows/downloads/windows-sdk/
+    echo    Then run: scripts\build_msix.bat
+)
+
+REM ── 7. Summary ──
 echo.
 echo ════════════════════════════════════════════════════════════
 echo   ✅  Windows build complete!
@@ -67,9 +76,16 @@ echo   Portable:   %BUILD_DIR%\%APP_NAME%-%VERSION%-Windows-Portable.zip
 if exist "%BUILD_DIR%\%INSTALLER_NAME%" (
     echo   Installer:  %BUILD_DIR%\%INSTALLER_NAME%
 )
+if exist "%BUILD_DIR%\%APP_NAME%-%VERSION%-Windows.msix" (
+    echo   MSIX:       %BUILD_DIR%\%APP_NAME%-%VERSION%-Windows.msix
+)
 echo.
 echo   ⚠  Note: Raw disk access requires running as Administrator.
 echo      Right-click → Run as Administrator
+echo.
+echo   ℹ  For a verified (no SmartScreen warning) MSIX:
+echo      1. Get an EV Code Signing cert from DigiCert/Sectigo
+echo      2. Run: scripts\build_msix.bat /cert:"C:\path\to.pfx" /pass:"password"
 echo.
 
 call deactivate

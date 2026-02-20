@@ -21,6 +21,14 @@ assets/icon.ico
 assets/icon.icns
 assets/icon.bmp
 
+# MSIX generated assets (rebuild with: python scripts/generate_msix_assets.py)
+msix/Assets/
+
+# MSIX dev certificate (contains private key — never commit!)
+msix/*.pfx
+msix/*.cer
+msix/*.p12
+
 # OS files
 .DS_Store
 Thumbs.db

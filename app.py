@@ -74,17 +74,12 @@ DAMAGE_ICONS = {
     "severe": "🔴", "fatal": "💀", "unknown": "❓",
 }
 
-# ─── Ad Banner Configuration ─────────────────────────────────
-# Replace AD_CLIENT and AD_SLOT with your Google AdSense IDs.
-# To disable ads, set AD_ENABLED = False.
-AD_ENABLED = True
-AD_CLIENT = "ca-pub-1526347652539106"   # Your AdSense Publisher ID
-AD_SLOT_TOP = "2901362329"              # Ad unit slot ID for top banner
-AD_SLOT_BOTTOM = "2901362329"           # Ad unit slot ID for bottom banner
-AD_BANNER_HEIGHT = 90                    # Banner height in pixels
-# Optional: serve ads from your own page (set to "" to use inline AdSense)
-AD_URL_TOP = ""     # e.g. "https://yoursite.com/ads/top-banner.html"
-AD_URL_BOTTOM = ""  # e.g. "https://yoursite.com/ads/bottom-banner.html"
+# ─── Donation Links ───────────────────────────────────────────
+# Update these URLs with your own accounts.
+DONATE_PAYPAL       = "https://paypal.me/YOUR_PAYPAL"          # PayPal.me link
+DONATE_GITHUB       = "https://github.com/sponsors/YOUR_GITHUB" # GitHub Sponsors
+DONATE_KOFI         = "https://ko-fi.com/YOUR_KOFI"            # Ko-fi
+DONATE_BUYMEACOFFEE = "https://buymeacoffee.com/YOUR_NAME"     # Buy Me a Coffee
 
 
 class DataRecoveryApp:
@@ -130,63 +125,87 @@ class DataRecoveryApp:
 
     def _setup_window(self):
         self.root.title(f"📸 IronRod Data Recovery  v{APP_VERSION}")
-        self.root.geometry("1200x800")
-        self.root.minsize(900, 600)
+
+        sw = self.root.winfo_screenwidth()
+        sh = self.root.winfo_screenheight()
+
+        # Initial size: 85% of screen, clamped between sensible bounds
+        win_w = max(900, min(int(sw * 0.85), 1600))
+        win_h = max(600, min(int(sh * 0.85), 1000))
+        self.root.geometry(f"{win_w}x{win_h}")
+        self.root.minsize(760, 520)
         self.root.configure(bg=BG_DARK)
+
+        # Compute a DPI-aware font scale (base = 96 DPI / 1920-wide screen)
+        self._dpi_scale = max(0.75, min(sw / 1920, 1.5))
+
         self.root.update_idletasks()
-        x = (self.root.winfo_screenwidth() - 1200) // 2
-        y = (self.root.winfo_screenheight() - 800) // 2
+        x = (sw - win_w) // 2
+        y = (sh - win_h) // 2
         self.root.geometry(f"+{x}+{y}")
 
+        # Store initial sidebar proportion
+        self._sidebar_ratio = 0.22   # 22% of window width
+
+
     def _setup_styles(self):
+        sc = self._dpi_scale   # font scale factor
+        def fs(base): return max(8, round(base * sc))
+
         s = ttk.Style()
         s.theme_use("clam")
-        s.configure(".", background=BG_DARK, foreground=FG_TEXT, font=(FONT, 11))
+        s.configure(".", background=BG_DARK, foreground=FG_TEXT, font=(FONT, fs(11)))
         s.configure("TFrame", background=BG_DARK)
         s.configure("Panel.TFrame", background=BG_PANEL)
-        s.configure("TLabel", background=BG_DARK, foreground=FG_TEXT, font=(FONT, 11))
+        s.configure("TLabel", background=BG_DARK, foreground=FG_TEXT, font=(FONT, fs(11)))
         s.configure("Panel.TLabel", background=BG_PANEL, foreground=FG_TEXT)
         s.configure("Header.TLabel", background=BG_DARK, foreground=FG_ACCENT,
-                     font=(FONT, 14, "bold"))
+                     font=(FONT, fs(14), "bold"))
         s.configure("PanelHeader.TLabel", background=BG_PANEL, foreground=FG_ACCENT,
-                     font=(FONT, 14, "bold"))
+                     font=(FONT, fs(14), "bold"))
         s.configure("Title.TLabel", background=BG_DARK, foreground=FG_WHITE,
-                     font=(FONT, 20, "bold"))
+                     font=(FONT, fs(20), "bold"))
         s.configure("Status.TLabel", background=BG_PANEL, foreground=FG_DIM,
-                     font=(FONT, 10))
+                     font=(FONT, fs(10)))
         s.configure("FilterLabel.TLabel", background=BG_PANEL, foreground=FG_TEXT,
-                     font=(FONT, 10))
+                     font=(FONT, fs(10)))
         s.configure("Count.TLabel", background=BG_PANEL, foreground=FG_WARN,
-                     font=(FONT, 11, "bold"))
+                     font=(FONT, fs(11), "bold"))
 
         s.configure("Accent.TButton", background=FG_ACCENT, foreground=FG_WHITE,
-                     font=(FONT, 12, "bold"), padding=(20, 10))
+                     font=(FONT, fs(12), "bold"), padding=(20, 10))
         s.map("Accent.TButton",
                background=[("active", "#5b8ad8"), ("disabled", "#555577")])
         s.configure("Save.TButton", background=FG_SUCCESS, foreground=FG_WHITE,
-                     font=(FONT, 12, "bold"), padding=(20, 10))
+                     font=(FONT, fs(12), "bold"), padding=(20, 10))
         s.map("Save.TButton",
                background=[("active", "#7ab55a"), ("disabled", "#555577")])
         s.configure("Danger.TButton", background=FG_ERROR, foreground=FG_WHITE,
-                     font=(FONT, 11, "bold"), padding=(15, 8))
+                     font=(FONT, fs(11), "bold"), padding=(15, 8))
         s.map("Danger.TButton", background=[("active", "#d45060")])
         s.configure("Secondary.TButton", background=BG_INPUT, foreground=FG_TEXT,
-                     font=(FONT, 11), padding=(15, 8))
+                     font=(FONT, fs(11)), padding=(15, 8))
         s.map("Secondary.TButton", background=[("active", "#444466")])
         s.configure("Small.TButton", background=BG_INPUT, foreground=FG_TEXT,
-                     font=(FONT, 9), padding=(8, 4))
+                     font=(FONT, fs(9)), padding=(8, 4))
         s.map("Small.TButton", background=[("active", "#444466")])
         s.configure("SelectAll.TButton", background="#2d5a27", foreground=FG_WHITE,
-                     font=(FONT, 9, "bold"), padding=(10, 5))
+                     font=(FONT, fs(9), "bold"), padding=(10, 5))
         s.map("SelectAll.TButton", background=[("active", "#3a7a32")])
         s.configure("SelectNone.TButton", background="#5a2727", foreground=FG_WHITE,
-                     font=(FONT, 9, "bold"), padding=(10, 5))
+                     font=(FONT, fs(9), "bold"), padding=(10, 5))
         s.map("SelectNone.TButton", background=[("active", "#7a3232")])
+        s.configure("Donate.TButton", background="#c0392b", foreground=FG_WHITE,
+                     font=(FONT, fs(11), "bold"), padding=(14, 8))
+        s.map("Donate.TButton", background=[("active", "#e74c3c")])
+        s.configure("DonateSm.TButton", background="#c0392b", foreground=FG_WHITE,
+                     font=(FONT, fs(9), "bold"), padding=(8, 4))
+        s.map("DonateSm.TButton", background=[("active", "#e74c3c")])
 
         s.configure("Custom.Horizontal.TProgressbar",
                      troughcolor=BG_INPUT, background=FG_ACCENT, thickness=25)
         s.configure("Category.TCheckbutton", background=BG_PANEL,
-                     foreground=FG_TEXT, font=(FONT, 12))
+                     foreground=FG_TEXT, font=(FONT, fs(12)))
         s.map("Category.TCheckbutton", background=[("active", BG_PANEL)])
 
         # ── Combobox styles: white background, dark readable text ──
@@ -198,7 +217,7 @@ class DataRecoveryApp:
                      selectbackground=FG_ACCENT,
                      selectforeground=FG_WHITE,
                      padding=(6, 4),
-                     font=(FONT, 11))
+                     font=(FONT, fs(11)))
         s.map("TCombobox",
                fieldbackground=[("readonly", BG_DROPDOWN)],
                foreground=[("readonly", FG_DROPDOWN)],
@@ -207,15 +226,16 @@ class DataRecoveryApp:
         # Dropdown list styling
         self.root.option_add("*TCombobox*Listbox.background", BG_DROPDOWN)
         self.root.option_add("*TCombobox*Listbox.foreground", FG_DROPDOWN)
-        self.root.option_add("*TCombobox*Listbox.font", f"{FONT} 11")
+        self.root.option_add("*TCombobox*Listbox.font", f"{FONT} {fs(11)}")
         self.root.option_add("*TCombobox*Listbox.selectBackground", FG_ACCENT)
         self.root.option_add("*TCombobox*Listbox.selectForeground", FG_WHITE)
 
         # ── Treeview: bigger rows for larger checkboxes ──
+        row_h = max(28, round(36 * sc))
         s.configure("Treeview", background=BG_INPUT, foreground=FG_TEXT,
-                     fieldbackground=BG_INPUT, rowheight=36, font=(FONT, 11))
+                     fieldbackground=BG_INPUT, rowheight=row_h, font=(FONT, fs(11)))
         s.configure("Treeview.Heading", background=BG_PANEL, foreground=FG_ACCENT,
-                     font=(FONT, 10, "bold"), padding=(4, 6))
+                     font=(FONT, fs(10), "bold"), padding=(4, 6))
         s.map("Treeview",
                background=[("selected", FG_ACCENT)],
                foreground=[("selected", FG_WHITE)])
@@ -223,7 +243,7 @@ class DataRecoveryApp:
         # ── Notebook tabs: dark background with readable text ──
         s.configure("TNotebook", background=BG_DARK, borderwidth=0)
         s.configure("TNotebook.Tab", background=BG_INPUT, foreground="#1a1a2e",
-                     font=(FONT, 12, "bold"), padding=(18, 8))
+                     font=(FONT, fs(12), "bold"), padding=(18, 8))
         s.map("TNotebook.Tab",
                background=[("selected", FG_ACCENT), ("active", "#444466")],
                foreground=[("selected", FG_WHITE), ("active", "#1a1a2e")])
@@ -239,161 +259,93 @@ class DataRecoveryApp:
         tf.pack(fill=tk.X, pady=(0, 5))
         ttk.Label(tf, text="📸 Deleted Photo & Video Recovery",
                    style="Title.TLabel").pack(side=tk.LEFT)
-        ttk.Label(tf, text="Raw sector scan → File carving → Save",
-                   style="Status.TLabel").pack(side=tk.LEFT, padx=(15, 0), pady=(8, 0))
+        self._subtitle_lbl = ttk.Label(tf, text="Raw sector scan → File carving → Save",
+                   style="Status.TLabel")
+        self._subtitle_lbl.pack(side=tk.LEFT, padx=(15, 0), pady=(8, 0))
+        ttk.Button(tf, text="❤️  Donate",
+                   command=self._show_donation_dialog,
+                   style="DonateSm.TButton").pack(side=tk.RIGHT, padx=(0, 2))
 
         content = ttk.Frame(self.main_frame)
         content.pack(fill=tk.BOTH, expand=True, pady=(10, 0))
         self._build_sidebar(content)
         self._build_main(content)
 
-        # Bottom ad banner
-        if AD_ENABLED:
-            self._build_ad_banner(self.main_frame, position="bottom")
-
-    # ─── Ad Banners ───────────────────────────────────────────
-
-    def _build_ad_banner(self, parent, position="top"):
-        """Build a small AdSense ad banner embedded in the app.
-
-        Uses tkinterweb.HtmlFrame for a real inline browser widget that
-        supports JavaScript (required for AdSense).  Falls back to a
-        clickable canvas placeholder when tkinterweb is unavailable.
-        """
-        is_sidebar = position == "sidebar"
-        ad_slot = (AD_SLOT_BOTTOM if is_sidebar
-                   else (AD_SLOT_TOP if position == "top" else AD_SLOT_BOTTOM))
-        ad_url = (AD_URL_BOTTOM if is_sidebar
-                  else (AD_URL_TOP if position == "top" else AD_URL_BOTTOM))
-        ad_h = 260 if is_sidebar else AD_BANNER_HEIGHT
-        pady = (5, 10) if is_sidebar else ((0, 8) if position == "top" else (8, 0))
-
-        ad_frame = ttk.Frame(parent, style="Panel.TFrame")
-        if is_sidebar:
-            ad_frame.pack(fill=tk.X, side=tk.BOTTOM, padx=5, pady=pady)
-        else:
-            ad_frame.pack(fill=tk.X, pady=pady)
-
-        # ── AdSense HTML snippet ──
-        ad_html = f"""<!DOCTYPE html>
-<html><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-  html, body {{ margin:0; padding:0; background:{BG_PANEL};
-    overflow:hidden; width:100%; height:{ad_h}px; }}
-  .ad-container {{ display:flex; align-items:center;
-    justify-content:center; width:100%; height:100%; }}
-  .ad-loading {{ color:#8888aa; font-family:Helvetica,sans-serif;
-    font-size:11px; text-align:center; }}
-</style></head><body>
-<div class="ad-container" id="ad-box">
-  <div class="ad-loading">Loading ad…</div>
-</div>
-<script async
-  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={AD_CLIENT}"
-  crossorigin="anonymous"></script>
-<ins class="adsbygoogle"
-  style="display:block"
-  data-ad-client="{AD_CLIENT}"
-  data-ad-slot="{ad_slot}"
-  data-ad-format="auto"
-  data-full-width-responsive="true"></ins>
-<script>(adsbygoogle = window.adsbygoogle || []).push({{}});</script>
-</body></html>"""
-
-        # ── Try tkinterweb for hosted ad URL (real web pages work) ──
-        if ad_url:
-            try:
-                from tkinterweb import HtmlFrame  # type: ignore
-
-                browser = HtmlFrame(ad_frame, height=ad_h,
-                                    messages_enabled=False)
-                browser.pack(fill=tk.X)
-                browser.load_url(ad_url)
-                logger.debug("Ad banner (%s) loaded via tkinterweb URL", position)
-                return
-            except Exception as exc:
-                logger.debug("tkinterweb unavailable (%s) — using fallback", exc)
-
-        # ── Clickable banner that opens the real AdSense page
-        #    in the system browser (AdSense JS cannot run inside
-        #    tkinterweb / tkhtml — it has no JS engine). ──
-        self._build_fallback_ad(ad_frame, position, ad_slot, ad_h, ad_html)
-
-    def _build_fallback_ad(self, parent, position, ad_slot, ad_h, ad_html=""):
-        """Clickable banner that opens the real AdSense ad page in the
-        user's default system browser (since AdSense JS cannot run inside
-        a Tkinter widget)."""
-        cx = 130 if position == "sidebar" else 600
-
-        banner = tk.Canvas(
-            parent, height=ad_h, bg="#2d2d44",
-            highlightthickness=1, highlightbackground="#444466",
-            cursor="hand2",
-        )
-        banner.pack(fill=tk.X)
-        banner.create_rectangle(0, 0, 2000, ad_h, fill="#2d2d44", outline="")
-        banner.create_text(20, 14, text="Ad", fill="#555577", font=(FONT, 8))
-
-        if position == "sidebar":
-            banner.create_text(cx, ad_h // 2 - 30, text="📢",
-                               fill=FG_ACCENT, font=(FONT, 28))
-            banner.create_text(cx, ad_h // 2 + 10, text="Support\nDevelopment",
-                               fill=FG_ACCENT, font=(FONT, 11, "bold"),
-                               justify=tk.CENTER)
-            banner.create_text(cx, ad_h // 2 + 50,
-                               text="Click to view ad\nin your browser",
-                               fill=FG_DIM, font=(FONT, 9), justify=tk.CENTER)
-        else:
-            banner.create_text(cx, ad_h // 2 - 10,
-                               text="📢  Support Development — Click Here",
-                               fill=FG_ACCENT, font=(FONT, 13, "bold"))
-            banner.create_text(cx, ad_h // 2 + 14,
-                               text="Help us keep this tool free • Opens in your browser",
-                               fill=FG_DIM, font=(FONT, 10))
-
-        # Build the full AdSense page to open in the system browser
-        _ad_page_html = ad_html if ad_html else f"""<!DOCTYPE html>
-<html><head><meta charset="utf-8">
-<title>Support Data Recovery Tool</title>
-<style>body{{margin:0;padding:20px;background:#1e1e2e;color:#e0e0e8;
-font-family:Helvetica,sans-serif;text-align:center;}}
-h2{{color:#7aa2f7;}} p{{color:#8888aa;font-size:14px;}}
-.ad-box{{margin:30px auto;max-width:728px;}}</style></head>
-<body>
-<h2>📢 Thank you for supporting Data Recovery Tool!</h2>
-<p>This free tool is supported by ads.</p>
-<div class="ad-box">
-<script async
-  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={AD_CLIENT}"
-  crossorigin="anonymous"></script>
-<ins class="adsbygoogle" style="display:block"
-  data-ad-client="{AD_CLIENT}" data-ad-slot="{ad_slot}"
-  data-ad-format="auto" data-full-width-responsive="true"></ins>
-<script>(adsbygoogle = window.adsbygoogle || []).push({{}});</script>
-</div></body></html>"""
-
-        def _open_ad(event=None):
-            import tempfile
-            try:
-                tmp = os.path.join(tempfile.gettempdir(), "datarecovery_ad.html")
-                with open(tmp, "w") as f:
-                    f.write(_ad_page_html)
-                webbrowser.open(f"file://{tmp}")
-            except Exception:
-                webbrowser.open("https://google.com")
-
-        banner.bind("<Button-1>", _open_ad)
+        # ── Bind resize events for responsive adjustments ──
+        self.root.bind("<Configure>", self._on_window_resize)
 
     # ─── Sidebar ──────────────────────────────────────────────
 
     def _build_sidebar(self, parent):
-        sb = ttk.Frame(parent, style="Panel.TFrame", width=280)
+        # Width = 22% of initial window, between 220–340 px
+        sw = self.root.winfo_width() or self.root.winfo_screenwidth()
+        sb_w = max(220, min(int(sw * self._sidebar_ratio), 340))
+        self._sidebar_wrap = sb_w - 40   # label wraplength
+
+        sb = ttk.Frame(parent, style="Panel.TFrame", width=sb_w)
         sb.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 10))
         sb.pack_propagate(False)
+        self._sidebar_frame = sb
+        self._sidebar_parent = parent
 
-        inner = ttk.Frame(sb, style="Panel.TFrame")
-        inner.pack(fill=tk.BOTH, expand=True, padx=15, pady=(15, 5))
+        # ── Scrollable canvas so content is accessible when window is short ──
+        sb_canvas = tk.Canvas(sb, bg=BG_PANEL, highlightthickness=0, bd=0)
+        sb_scrollbar = ttk.Scrollbar(sb, orient=tk.VERTICAL, command=sb_canvas.yview)
+        sb_canvas.configure(yscrollcommand=sb_scrollbar.set)
+
+        # Scrollbar always in layout (takes no space when not needed)
+        sb_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        sb_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Inner scrollable frame placed inside the canvas
+        inner = ttk.Frame(sb_canvas, style="Panel.TFrame")
+        inner_window = sb_canvas.create_window((0, 0), window=inner, anchor="nw")
+
+        def _on_inner_configure(event):
+            sb_canvas.configure(scrollregion=sb_canvas.bbox("all"))
+
+        def _on_canvas_configure(event):
+            # Make inner frame always fill canvas width
+            sb_canvas.itemconfig(inner_window, width=event.width)
+            # Reset scroll region too
+            sb_canvas.configure(scrollregion=sb_canvas.bbox("all"))
+
+        inner.bind("<Configure>", _on_inner_configure)
+        sb_canvas.bind("<Configure>", _on_canvas_configure)
+
+        # Mouse-wheel scrolling — only fires when pointer is over the sidebar
+        def _on_mousewheel(event):
+            # macOS: event.delta is ±120 per notch; trackpad may be smaller
+            if event.delta:
+                sb_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+            elif event.num == 4:
+                sb_canvas.yview_scroll(-1, "units")
+            elif event.num == 5:
+                sb_canvas.yview_scroll(1, "units")
+
+        def _bind_mousewheel(event=None):
+            sb_canvas.bind_all("<MouseWheel>", _on_mousewheel)
+            sb_canvas.bind_all("<Button-4>",   _on_mousewheel)
+            sb_canvas.bind_all("<Button-5>",   _on_mousewheel)
+
+        def _unbind_mousewheel(event=None):
+            sb_canvas.unbind_all("<MouseWheel>")
+            sb_canvas.unbind_all("<Button-4>")
+            sb_canvas.unbind_all("<Button-5>")
+
+        # Bind scroll only while cursor is inside the sidebar
+        sb.bind("<Enter>", lambda e: _bind_mousewheel())
+        sb.bind("<Leave>", lambda e: _unbind_mousewheel())
+        sb_canvas.bind("<Enter>", lambda e: _bind_mousewheel())
+        sb_canvas.bind("<Leave>", lambda e: _unbind_mousewheel())
+
+        self._sidebar_canvas = sb_canvas
+        self._sidebar_scrollbar = sb_scrollbar
+
+        # ── Rest of sidebar content goes into `inner` (now scrollable) ──
+        inner_pad = ttk.Frame(inner, style="Panel.TFrame")
+        inner_pad.pack(fill=tk.BOTH, expand=True, padx=15, pady=(15, 5))
+        inner = inner_pad  # rebind so all subsequent code uses padded frame
 
         # Drive selection
         ttk.Label(inner, text="📀 Select Drive",
@@ -409,12 +361,12 @@ h2{{color:#7aa2f7;}} p{{color:#8888aa;font-size:14px;}}
                     style="Secondary.TButton").pack(side=tk.RIGHT, padx=(2, 0))
 
         self.drive_info = ttk.Label(inner, text="No drive selected",
-                                     style="Status.TLabel", wraplength=240)
+                                     style="Status.TLabel", wraplength=self._sidebar_wrap)
         self.drive_info.pack(anchor=tk.W, pady=(5, 0))
 
         # Drive health / TRIM warning
         self.health_lbl = ttk.Label(inner, text="",
-                                     style="Status.TLabel", wraplength=240)
+                                     style="Status.TLabel", wraplength=self._sidebar_wrap)
         self.health_lbl.pack(anchor=tk.W, pady=(3, 0))
 
         ttk.Separator(inner, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=15)
@@ -423,7 +375,7 @@ h2{{color:#7aa2f7;}} p{{color:#8888aa;font-size:14px;}}
         ttk.Label(inner, text="📂 Recovery Targets",
                    style="PanelHeader.TLabel").pack(anchor=tk.W)
         ttk.Label(inner, text="Recovers 95+ file types from any\nstorage device & filesystem.",
-                   style="Status.TLabel", wraplength=240).pack(anchor=tk.W, pady=(5, 0))
+                   style="Status.TLabel", wraplength=self._sidebar_wrap).pack(anchor=tk.W, pady=(5, 0))
 
         cf = ttk.Frame(inner, style="Panel.TFrame")
         cf.pack(fill=tk.X, pady=(10, 0))
@@ -445,14 +397,15 @@ h2{{color:#7aa2f7;}} p{{color:#8888aa;font-size:14px;}}
                    style="Panel.TLabel", font=(FONT, 10, "bold"),
                    foreground=FG_WARN).pack(anchor=tk.W)
         ttk.Label(nf, text="Run with sudo (macOS/Linux) or\nAdministrator (Windows).",
-                   style="Status.TLabel", wraplength=240).pack(anchor=tk.W, pady=(3, 0))
+                   style="Status.TLabel", wraplength=self._sidebar_wrap).pack(anchor=tk.W, pady=(3, 0))
 
-        # Bottom
-        bottom = ttk.Frame(sb, style="Panel.TFrame")
-        bottom.pack(fill=tk.X, side=tk.BOTTOM, padx=15, pady=(5, 15))
-        ttk.Separator(bottom, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=(0, 10))
+        ttk.Separator(inner, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=(15, 5))
+
+        # Bottom section — inside scrollable area so it's reachable when minimized
+        bottom = ttk.Frame(inner, style="Panel.TFrame")
+        bottom.pack(fill=tk.X, pady=(0, 10))
         ttk.Label(bottom, text="🔒 Read-Only — source drive is never modified",
-                   style="Status.TLabel", wraplength=240).pack(anchor=tk.W, pady=(0, 8))
+                   style="Status.TLabel", wraplength=self._sidebar_wrap).pack(anchor=tk.W, pady=(0, 8))
 
         self.scan_btn = ttk.Button(bottom, text="⚡  Scan for Deleted Files",
                                     command=self._start_scan, style="Accent.TButton")
@@ -465,9 +418,92 @@ h2{{color:#7aa2f7;}} p{{color:#8888aa;font-size:14px;}}
                                      command=self._toggle_pause_validation,
                                      style="Secondary.TButton")
 
-        # Sidebar ad banner
-        if AD_ENABLED:
-            self._build_ad_banner(sb, position="sidebar")
+        self._build_donation_banner(inner)
+
+    # ─── Donation ─────────────────────────────────────────────
+
+    def _build_donation_banner(self, parent):
+        """Compact donation section at the bottom of the sidebar."""
+        ttk.Separator(parent, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=(12, 8))
+
+        df = ttk.Frame(parent, style="Panel.TFrame")
+        df.pack(fill=tk.X, pady=(0, 12))
+
+        ttk.Label(df, text="❤️  Support IronRod",
+                   style="Panel.TLabel", font=(FONT, 10, "bold"),
+                   foreground="#e74c3c").pack(anchor=tk.W)
+        ttk.Label(df,
+                   text="Free & open-source. If IronRod\nhelped you, consider a small tip!",
+                   style="Status.TLabel",
+                   wraplength=self._sidebar_wrap).pack(anchor=tk.W, pady=(3, 8))
+
+        ttk.Button(df, text="❤️  Donate / Support This Project",
+                    command=self._show_donation_dialog,
+                    style="Donate.TButton").pack(fill=tk.X, ipady=3)
+
+    def _show_donation_dialog(self):
+        """Modal dialog with multiple donation platform options."""
+        dlg = tk.Toplevel(self.root)
+        dlg.title("Support IronRod ❤️")
+        dlg.configure(bg=BG_DARK)
+        dlg.resizable(False, False)
+        dlg.grab_set()  # modal
+
+        # Centre over parent window
+        self.root.update_idletasks()
+        pw, ph = self.root.winfo_width(), self.root.winfo_height()
+        px, py = self.root.winfo_x(), self.root.winfo_y()
+        dw, dh = 460, 480
+        dlg.geometry(f"{dw}x{dh}+{px + (pw - dw)//2}+{py + (ph - dh)//2}")
+
+        pad = dict(padx=28)
+
+        # ── Header ──
+        hf = tk.Frame(dlg, bg="#c0392b")
+        hf.pack(fill=tk.X)
+        tk.Label(hf, text="❤️", bg="#c0392b", fg=FG_WHITE,
+                  font=(FONT, 32)).pack(pady=(18, 4))
+        tk.Label(hf, text="Support IronRod", bg="#c0392b", fg=FG_WHITE,
+                  font=(FONT, 18, "bold")).pack()
+        tk.Label(hf, text="Keep this free tool alive", bg="#c0392b",
+                  fg="#ffaaaa", font=(FONT, 11)).pack(pady=(2, 18))
+
+        # ── Body ──
+        bf = tk.Frame(dlg, bg=BG_DARK)
+        bf.pack(fill=tk.BOTH, expand=True, pady=18)
+
+        tk.Label(bf,
+                  text="IronRod is 100% free and open-source.\n"
+                       "Your donation — however small — helps fund\n"
+                       "development, hosting, and new features.",
+                  bg=BG_DARK, fg=FG_TEXT, font=(FONT, 11),
+                  justify=tk.CENTER).pack(**pad, pady=(0, 20))
+
+        # Donation platform buttons
+        platforms = [
+            ("☕  Buy Me a Coffee",  "#f0a500", DONATE_BUYMEACOFFEE),
+            ("💙  Ko-fi",            "#29abe0", DONATE_KOFI),
+            ("🅿️  PayPal",           "#003087", DONATE_PAYPAL),
+            ("🐙  GitHub Sponsors",  "#6e40c9", DONATE_GITHUB),
+        ]
+        for label, colour, url in platforms:
+            btn = tk.Button(
+                bf, text=label,
+                bg=colour, fg=FG_WHITE, activebackground=colour,
+                activeforeground=FG_WHITE,
+                font=(FONT, 12, "bold"), relief=tk.FLAT,
+                cursor="hand2", bd=0,
+                command=lambda u=url: webbrowser.open(u),
+            )
+            btn.pack(fill=tk.X, **pad, pady=4, ipady=7)
+
+        # ── Footer ──
+        tk.Label(dlg,
+                  text="Thank you for your support! 🙏",
+                  bg=BG_DARK, fg=FG_DIM, font=(FONT, 9)
+                  ).pack(pady=(0, 6))
+        ttk.Button(dlg, text="Close", command=dlg.destroy,
+                    style="Secondary.TButton").pack(pady=(0, 16))
 
     # ─── Main area ────────────────────────────────────────────
 
@@ -637,15 +673,19 @@ h2{{color:#7aa2f7;}} p{{color:#8888aa;font-size:14px;}}
         fi.pack(fill=tk.BOTH, expand=True)
         cols = ("check", "name", "extension", "size", "sector", "type", "health", "source", "md5")
         self.tree = ttk.Treeview(fi, columns=cols, show="headings", selectmode="extended")
-        for col, (heading, w, anch) in {
-            "check": ("  ✔", 50, tk.CENTER), "name": ("File Name", 190, tk.W),
-            "extension": ("Ext", 58, tk.W), "size": ("Size", 85, tk.W),
-            "sector": ("Sector", 85, tk.W), "type": ("Type", 120, tk.W),
-            "health": ("🩺 Health", 110, tk.W), "source": ("Source", 65, tk.W),
-            "md5": ("MD5", 100, tk.W),
+        for col, (heading, w, anch, stretch) in {
+            "check":     ("  ✔",      50,  tk.CENTER, False),
+            "name":      ("File Name", 190, tk.W,      True),
+            "extension": ("Ext",       58,  tk.W,      False),
+            "size":      ("Size",      85,  tk.W,      False),
+            "sector":    ("Sector",    85,  tk.W,      False),
+            "type":      ("Type",      120, tk.W,      True),
+            "health":    ("🩺 Health", 110, tk.W,      False),
+            "source":    ("Source",    65,  tk.W,      False),
+            "md5":       ("MD5",       100, tk.W,      True),
         }.items():
             self.tree.heading(col, text=heading, anchor=anch)
-            self.tree.column(col, width=w, minwidth=35, anchor=anch)
+            self.tree.column(col, width=w, minwidth=35, anchor=anch, stretch=stretch)
         fvs = ttk.Scrollbar(fi, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscrollcommand=fvs.set)
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -697,15 +737,19 @@ h2{{color:#7aa2f7;}} p{{color:#8888aa;font-size:14px;}}
         wfi = ttk.Frame(wfp)
         wfi.pack(fill=tk.BOTH, expand=True)
         self.workable_tree = ttk.Treeview(wfi, columns=cols, show="headings", selectmode="extended")
-        for col, (heading, w, anch) in {
-            "check": ("  ✔", 50, tk.CENTER), "name": ("File Name", 190, tk.W),
-            "extension": ("Ext", 58, tk.W), "size": ("Size", 85, tk.W),
-            "sector": ("Sector", 85, tk.W), "type": ("Type", 120, tk.W),
-            "health": ("🩺 Health", 110, tk.W), "source": ("Source", 65, tk.W),
-            "md5": ("MD5", 100, tk.W),
+        for col, (heading, w, anch, stretch) in {
+            "check":     ("  ✔",      50,  tk.CENTER, False),
+            "name":      ("File Name", 190, tk.W,      True),
+            "extension": ("Ext",       58,  tk.W,      False),
+            "size":      ("Size",      85,  tk.W,      False),
+            "sector":    ("Sector",    85,  tk.W,      False),
+            "type":      ("Type",      120, tk.W,      True),
+            "health":    ("🩺 Health", 110, tk.W,      False),
+            "source":    ("Source",    65,  tk.W,      False),
+            "md5":       ("MD5",       100, tk.W,      True),
         }.items():
             self.workable_tree.heading(col, text=heading, anchor=anch)
-            self.workable_tree.column(col, width=w, minwidth=35, anchor=anch)
+            self.workable_tree.column(col, width=w, minwidth=35, anchor=anch, stretch=stretch)
         wfvs = ttk.Scrollbar(wfi, orient=tk.VERTICAL, command=self.workable_tree.yview)
         self.workable_tree.configure(yscrollcommand=wfvs.set)
         self.workable_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -721,6 +765,34 @@ h2{{color:#7aa2f7;}} p{{color:#8888aa;font-size:14px;}}
         # Make "Truly Workable" the first tab
         self.results_notebook.insert(0, workable_tab)
         self.results_notebook.select(workable_tab)
+
+    # ─── Responsive resize handler ────────────────────────────
+
+    def _on_window_resize(self, event=None):
+        """Dynamically adjust sidebar width and label wraplengths on resize."""
+        if event and event.widget is not self.root:
+            return
+        win_w = self.root.winfo_width()
+        win_h = self.root.winfo_height()
+
+        # Update subtitle visibility (hide on very narrow windows)
+        if hasattr(self, '_subtitle_lbl'):
+            if win_w < 900:
+                self._subtitle_lbl.pack_forget()
+            else:
+                try:
+                    self._subtitle_lbl.pack(side=tk.LEFT, padx=(15, 0), pady=(8, 0))
+                except Exception:
+                    pass
+
+        # Resize sidebar proportionally
+        if hasattr(self, '_sidebar_frame'):
+            new_sb_w = max(220, min(int(win_w * self._sidebar_ratio), 340))
+            new_wrap = new_sb_w - 40
+            self._sidebar_frame.configure(width=new_sb_w)
+            # Update all wraplength labels in sidebar
+            for lbl in (self.drive_info, self.health_lbl):
+                lbl.configure(wraplength=new_wrap)
 
     # ─── Category tree ────────────────────────────────────────
 

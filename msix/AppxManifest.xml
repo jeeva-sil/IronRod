@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MSIX Package Manifest for IronRod
+  ════════════════════════════════════════════════════════════════
+
+  IMPORTANT — Publisher field:
+  The Publisher value here MUST exactly match the Subject (CN=...) of
+  the certificate you use to sign the MSIX.
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │ For DEV / TESTING (self-signed cert):                       │
+  │   Run: scripts\create_cert.ps1                              │
+  │   Publisher will be: CN=IronRod Team                        │
+  │                                                             │
+  │ For PRODUCTION (trusted, no warning on any PC):             │
+  │   Purchase an EV Code Signing cert from:                    │
+  │     - DigiCert: https://www.digicert.com/signing/           │
+  │     - Sectigo:  https://sectigo.com/ssl-certificates-tls    │
+  │   Update Publisher below to match your cert's Subject:      │
+  │     e.g. CN=Your Company LLC, O=Your Company, C=US          │
+  └─────────────────────────────────────────────────────────────┘
+
+  For Microsoft Store submission, remove the Publisher attribute
+  from Identity — Microsoft assigns it automatically.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap rescap">
+
+  <!-- ── Identity ─────────────────────────────────────────────── -->
+  <!--
+    Name: unique package identifier (reverse-DNS style)
+    Publisher: must match signing certificate Subject EXACTLY
+    Version: four-part version (Major.Minor.Build.Revision)
+  -->
+  <Identity
+    Name="IronRod.DataRecovery"
+    Publisher="CN=IronRod Team"
+    Version="1.0.0.0"
+    ProcessorArchitecture="x64" />
+
+  <!-- ── Metadata shown in Settings → Apps ─────────────────────── -->
+  <Properties>
+    <DisplayName>IronRod</DisplayName>
+    <PublisherDisplayName>IronRod Team</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <Description>Universal Data Recovery — Recover deleted photos, videos, and files from any drive.</Description>
+  </Properties>
+
+  <!-- ── Windows version targeting ────────────────────────────── -->
+  <!-- MinVersion 17763 = Windows 10 1809 (MSIX minimum) -->
+  <Dependencies>
+    <TargetDeviceFamily
+      Name="Windows.Desktop"
+      MinVersion="10.0.17763.0"
+      MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <!-- ── Supported languages ──────────────────────────────────── -->
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
+  <!-- ── Application entry point ──────────────────────────────── -->
+  <Applications>
+    <Application
+      Id="IronRod"
+      Executable="IronRod.exe"
+      EntryPoint="Windows.FullTrustApplication">
+
+      <uap:VisualElements
+        DisplayName="IronRod"
+        Description="Universal Data Recovery Tool"
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+
+        <uap:DefaultTile
+          Wide310x150Logo="Assets\Wide310x150Logo.png"
+          Square310x310Logo="Assets\Square310x310Logo.png"
+          Square71x71Logo="Assets\Square71x71Logo.png"
+          ShortName="IronRod" />
+
+        <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#1e1e2e" />
+
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <!-- ── Capabilities ─────────────────────────────────────────── -->
+  <!--
+    runFullTrust: required for Win32/PyInstaller apps packaged as MSIX.
+    This allows the app to run with full user permissions (not sandboxed).
+    Note: raw disk access still requires the user to run as Administrator.
+  -->
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+
+</Package>
