@@ -147,6 +147,92 @@ jobs:
           makensis /DVERSION=${{ steps.version.outputs.version }} /DOUTFILE="dist\${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-Windows-Setup.exe" scripts\installer.nsi
         continue-on-error: true
 
+      - name: Generate MSIX assets
+        shell: powershell
+        run: |
+          python -X utf8 scripts/generate_msix_assets.py
+        continue-on-error: true
+
+      - name: Build MSIX package
+        shell: powershell
+        run: |
+          $Version = "${{ steps.version.outputs.version }}"
+          $VersionQuad = "$Version.0"  # MSIX requires 4-part version
+          if ($Version -match '^\d+\.\d+\.\d+\.\d+$') { $VersionQuad = $Version }
+          elseif ($Version -match '^\d+\.\d+\.\d+$') { $VersionQuad = "$Version.0" }
+          elseif ($Version -match '^\d+\.\d+$') { $VersionQuad = "$Version.0.0" }
+
+          $AppName       = "${{ env.APP_NAME }}"
+          $DistDir       = "dist"
+          $AppDir        = "$DistDir\$AppName"
+          $StagingDir    = "$DistDir\msix_staging"
+          $MsixOut       = "$DistDir\$AppName-$Version-Windows.msix"
+
+          # Verify PyInstaller output
+          if (-not (Test-Path "$AppDir\$AppName.exe")) {
+            Write-Host "::error::PyInstaller output not found at $AppDir\$AppName.exe"
+            exit 1
+          }
+
+          # Find MakeAppx.exe from Windows SDK
+          $MakeAppx = $null
+          $sdkRoots = @(
+            "C:\Program Files (x86)\Windows Kits\10\bin",
+            "C:\Program Files\Windows Kits\10\bin"
+          )
+          foreach ($root in $sdkRoots) {
+            if (-not (Test-Path $root)) { continue }
+            $versions = Get-ChildItem $root -Directory | Where-Object { $_.Name -match "^10\." } |
+                        Sort-Object Name -Descending
+            foreach ($ver in $versions) {
+              $p = Join-Path $ver.FullName "x64\makeappx.exe"
+              if (Test-Path $p) { $MakeAppx = $p; break }
+            }
+            if ($MakeAppx) { break }
+          }
+          if (-not $MakeAppx) {
+            Write-Host "::error::MakeAppx.exe not found. Windows SDK may not be installed."
+            exit 1
+          }
+          Write-Host "Found MakeAppx: $MakeAppx"
+
+          # Update version in manifest
+          $ManifestSrc = "msix\AppxManifest.xml"
+          $manifestContent = Get-Content $ManifestSrc -Raw
+          $manifestContent = $manifestContent -replace 'Version="[\d\.]+"', "Version=`"$VersionQuad`""
+          Set-Content -Path $ManifestSrc -Value $manifestContent
+
+          # Prepare staging directory
+          if (Test-Path $StagingDir) { Remove-Item $StagingDir -Recurse -Force }
+          New-Item -ItemType Directory -Path $StagingDir | Out-Null
+
+          # Copy app files
+          Copy-Item "$AppDir\*" $StagingDir -Recurse -Force
+
+          # Copy manifest
+          Copy-Item $ManifestSrc (Join-Path $StagingDir "AppxManifest.xml") -Force
+
+          # Copy MSIX assets
+          $stagingAssets = Join-Path $StagingDir "Assets"
+          New-Item -ItemType Directory -Path $stagingAssets -Force | Out-Null
+          if (Test-Path "msix\Assets") {
+            Copy-Item "msix\Assets\*" $stagingAssets -Recurse -Force
+          }
+
+          # Pack MSIX (unsigned)
+          if (Test-Path $MsixOut) { Remove-Item $MsixOut -Force }
+          & $MakeAppx pack /d $StagingDir /p $MsixOut /nv /o
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error::MakeAppx pack failed"
+            exit 1
+          }
+
+          # Cleanup staging
+          Remove-Item $StagingDir -Recurse -Force
+
+          $sizeMB = [math]::Round((Get-Item $MsixOut).Length / 1MB, 1)
+          Write-Host "✅ MSIX built: $MsixOut ($sizeMB MB)"
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -154,6 +240,7 @@ jobs:
           path: |
             dist/*.zip
             dist/*-Setup.exe
+            dist/*.msix
 
   # ════════════════════════════════════════════════════════════
   # Linux — AppImage + .deb + .tar.gz
@@ -332,6 +419,7 @@ jobs:
             release-assets/**/*.dmg
             release-assets/**/*.exe
             release-assets/**/*.zip
+            release-assets/**/*.msix
             release-assets/**/*.tar.gz
             release-assets/**/*.deb
             release-assets/**/*.AppImage
@@ -341,6 +429,7 @@ jobs:
             | Platform | File | Description |
             |----------|------|-------------|
             | 🍎 macOS | `IronRod-${{ steps.version.outputs.version }}-macOS.dmg` | DMG installer — Intel & Apple Silicon (Rosetta 2) |
+            | 🪟 Windows (MSIX) | `IronRod-${{ steps.version.outputs.version }}-Windows.msix` | **MSIX package — clean Windows install** |
             | 🪟 Windows (Installer) | `IronRod-${{ steps.version.outputs.version }}-Windows-Setup.exe` | NSIS installer — adds to Start Menu |
             | 🪟 Windows (Portable) | `IronRod-${{ steps.version.outputs.version }}-Windows-Portable.zip` | No install needed — extract & run |
             | 🐧 Linux (AppImage) | `IronRod-${{ steps.version.outputs.version }}-Linux-x86_64.AppImage` | Universal — chmod +x & run |

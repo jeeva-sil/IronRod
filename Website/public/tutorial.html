@@ -14,6 +14,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1526347652539106"
+        crossorigin="anonymous"></script>
 
     <style>
         *,
@@ -991,7 +994,8 @@
                         <div><strong>Disk images:</strong> For critical recovery, create a full disk image first using
                             <code
                                 style="color:#9ece6a; background:#16161e; padding:2px 6px; border-radius:4px;">dd</code>
-                            and scan the image instead. This preserves the original drive state.</div>
+                            and scan the image instead. This preserves the original drive state.
+                        </div>
                     </div>
 
                     <div class="info-box info-success">
@@ -1018,7 +1022,7 @@
 
     <!-- FAQ -->
     <div class="container">
-        <div class="faq reveal">
+        <div class="faq reveal" id="faq" data-section="faq">
             <h2>Frequently Asked Questions</h2>
 
             <div class="faq-item">
@@ -1118,6 +1122,11 @@
             document.getElementById('backTop').classList.toggle('visible', window.scrollY > 400);
         });
     </script>
+
+    <!-- Firebase Analytics -->
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics-compat.js"></script>
+    <script src="/analytics.js"></script>
 
 </body>
 

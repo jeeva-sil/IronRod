@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet">
   <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1526347652539106"
     crossorigin="anonymous"></script>
 
   <style>
@@ -927,7 +927,7 @@
       <div class="ad-label">Ad</div>
       <div class="ad-slot" id="ad-left">
         <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px"
-          data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins>
+          data-ad-client="ca-pub-1526347652539106" data-ad-slot="2901362329"></ins>
       </div>
       <div class="ad-placeholder" id="ad-left-placeholder">
         <div class="ad-placeholder-icon">📢</div>
@@ -942,7 +942,7 @@
       <div class="ad-label">Ad</div>
       <div class="ad-slot" id="ad-right">
         <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px"
-          data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins>
+          data-ad-client="ca-pub-1526347652539106" data-ad-slot="2901362329"></ins>
       </div>
       <div class="ad-placeholder" id="ad-right-placeholder">
         <div class="ad-placeholder-icon">📢</div>
@@ -973,7 +973,7 @@
   </nav>
 
   <!-- Hero -->
-  <section class="hero">
+  <section class="hero" id="hero" data-section="hero">
     <div class="hero-content">
       <div class="badge"><span class="pulse"></span> v1.0.6 — 100% Free Forever</div>
       <h1>Recover What<br>Was Lost</h1>
@@ -1144,7 +1144,7 @@
   </section>
 
   <!-- Filesystems -->
-  <section class="filesystems">
+  <section class="filesystems" id="filesystems" data-section="filesystems">
     <div class="container reveal">
       <div class="section-label">Filesystems</div>
       <h2 class="section-title">Works on any filesystem</h2>
@@ -1181,17 +1181,26 @@
           <h3>macOS</h3>
           <div class="dl-version">v1.0.6 · Intel &amp; Apple Silicon</div>
           <div class="dl-options">
-            <a href="https://github.com/jeeva-sil/IronRod/releases/latest" class="dl-btn dl-btn-primary" target="_blank"
-              rel="noopener">
+            <a href="https://github.com/jeeva-sil/IronRod/releases/download/v1.0.6/IronRod-1.0.6-macOS-x86_64.dmg"
+              class="dl-btn dl-btn-primary">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
-              Download DMG
+              Download DMG (Intel)
+            </a>
+            <a href="https://github.com/jeeva-sil/IronRod/releases/download/v1.0.6/IronRod-1.0.6-macOS.dmg"
+              class="dl-btn dl-btn-primary">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download DMG (Apple Silicon)
             </a>
           </div>
-          <div class="dl-size">~21 MB · macOS 10.15+ · Intel via Rosetta 2</div>
+          <div class="dl-size">~21 MB · macOS 10.15+</div>
         </div>
 
         <!-- Windows -->
@@ -1200,17 +1209,26 @@
           <h3>Windows</h3>
           <div class="dl-version">v1.0.6 · Windows 10/11 64-bit</div>
           <div class="dl-options">
-            <a href="https://github.com/jeeva-sil/IronRod/releases/latest" class="dl-btn dl-btn-primary" target="_blank"
-              rel="noopener">
+            <a href="https://github.com/jeeva-sil/IronRod/releases/download/v1.0.6/IronRod-1.0.6-Windows.msix"
+              class="dl-btn dl-btn-primary">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
-              Download Portable ZIP
+              Download MSIX Installer
+            </a>
+            <a href="https://github.com/jeeva-sil/IronRod/releases/download/v1.0.6/IronRod-1.0.6-Windows-Portable.zip"
+              class="dl-btn dl-btn-primary">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Portable ZIP
             </a>
           </div>
-          <div class="dl-size">~22 MB · Run as Administrator</div>
+          <div class="dl-size">~22 MB · Windows 10/11 · Run as Administrator</div>
         </div>
 
         <!-- Linux -->
@@ -1219,8 +1237,8 @@
           <h3>Linux</h3>
           <div class="dl-version">v1.0.6 · x86_64</div>
           <div class="dl-options">
-            <a href="https://github.com/jeeva-sil/IronRod/releases/latest" class="dl-btn dl-btn-primary" target="_blank"
-              rel="noopener">
+            <a href="https://github.com/jeeva-sil/IronRod/releases/download/v1.0.6/IronRod-1.0.6-Linux-x86_64.AppImage"
+              class="dl-btn dl-btn-primary">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
@@ -1228,8 +1246,8 @@
               </svg>
               Download AppImage
             </a>
-            <a href="https://github.com/jeeva-sil/IronRod/releases/latest" class="dl-btn" target="_blank"
-              rel="noopener">
+            <a href="https://github.com/jeeva-sil/IronRod/releases/download/v1.0.6/ironrod_1.0.6_amd64.deb"
+              class="dl-btn dl-btn-primary">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
@@ -1237,8 +1255,8 @@
               </svg>
               Debian/Ubuntu (.deb)
             </a>
-            <a href="https://github.com/jeeva-sil/IronRod/releases/latest" class="dl-btn" target="_blank"
-              rel="noopener">
+            <a href="https://github.com/jeeva-sil/IronRod/releases/download/v1.0.6/IronRod-1.0.6-Linux-x86_64.tar.gz"
+              class="dl-btn dl-btn-primary">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
@@ -1255,7 +1273,7 @@
   </section>
 
   <!-- CTA -->
-  <section class="cta">
+  <section class="cta" id="cta" data-section="cta">
     <div class="container reveal">
       <div class="cta-box">
         <h2>Your files aren't gone<br>until they're overwritten.</h2>
@@ -1283,7 +1301,7 @@
       <div class="interstitial-label">Sponsored</div>
       <div class="interstitial-ad-slot" id="interstitial-ad">
         <ins class="adsbygoogle" style="display:block; width:100%; min-height:250px;"
-          data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto"
+          data-ad-client="ca-pub-1526347652539106" data-ad-slot="2901362329" data-ad-format="auto"
           data-full-width-responsive="true"></ins>
         <div class="interstitial-ad-placeholder" id="interstitial-placeholder">
           <div class="ad-placeholder-icon">📢</div>
@@ -1419,6 +1437,11 @@
       });
     }, 3000);
   </script>
+
+  <!-- Firebase Analytics -->
+  <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics-compat.js"></script>
+  <script src="/analytics.js"></script>
 
 </body>
 
