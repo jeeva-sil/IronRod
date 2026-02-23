@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Privacy Policy — IronRod</title>
+    <meta name="description" content="Privacy Policy for the IronRod data recovery application and website.">
+    <meta name="theme-color" content="#0f0f1a">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1526347652539106"
+        crossorigin="anonymous"></script>
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a14;
+            color: #e0e0e8;
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* ─── Background ─── */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-glow .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.18;
+        }
+
+        .bg-glow .orb:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            background: #7aa2f7;
+            top: -10%;
+            left: -5%;
+        }
+
+        .bg-glow .orb:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: #9ece6a;
+            bottom: -15%;
+            right: -10%;
+        }
+
+        /* ─── Navbar ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            background: rgba(10, 10, 20, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(122, 162, 247, 0.1);
+        }
+
+        nav .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #7aa2f7, #9ece6a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #8888aa;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #e0e0e8;
+        }
+
+        .nav-cta {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            background: linear-gradient(135deg, #7aa2f7, #5d8ce6);
+            color: #fff !important;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(122, 162, 247, 0.4);
+        }
+
+        /* ─── Container ─── */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ─── Page Header ─── */
+        .page-header {
+            padding: 140px 24px 60px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #e0e0e8 0%, #7aa2f7 50%, #9ece6a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .page-header p {
+            color: #8888aa;
+            font-size: 1.15rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ─── Content ─── */
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+
+        .content h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin: 48px 0 16px;
+            color: #e0e0e8;
+        }
+
+        .content h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 32px 0 12px;
+            color: #c0c0d8;
+        }
+
+        .content p {
+            color: #b0b0c8;
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+            line-height: 1.8;
+        }
+
+        .content ul {
+            list-style: none;
+            margin: 12px 0 20px;
+        }
+
+        .content ul li {
+            padding: 6px 0;
+            color: #b0b0c8;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .content ul li::before {
+            content: '•';
+            color: #7aa2f7;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .content a {
+            color: #7aa2f7;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .content a:hover {
+            color: #9ece6a;
+        }
+
+        .content strong {
+            color: #e0e0e8;
+        }
+
+        .highlight-box {
+            background: rgba(30, 30, 46, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin: 24px 0;
+        }
+
+        .highlight-box p {
+            margin-bottom: 8px;
+        }
+
+        .highlight-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .update-date {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(122, 162, 247, 0.1);
+            border: 1px solid rgba(122, 162, 247, 0.2);
+            color: #7aa2f7;
+            margin-bottom: 32px;
+        }
+
+        /* ─── Footer ─── */
+        footer {
+            padding: 40px 24px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #444;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            position: relative;
+            z-index: 1;
+        }
+
+        footer a {
+            color: #7aa2f7;
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* ─── Scroll reveal ─── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s, transform 0.6s;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-glow">
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">🔧</div>
+                IronRod
+            </a>
+            <div class="nav-links">
+                <a href="index.html#features">Features</a>
+                <a href="tutorial.html">Tutorial</a>
+                <a href="index.html#formats">Formats</a>
+                <a href="index.html#download" class="nav-cta">Download Free</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Privacy Policy</h1>
+            <p>Your privacy matters. Here's exactly what data we collect, why, and how it's used.</p>
+        </div>
+    </section>
+
+    <!-- Content -->
+    <div class="container">
+        <div class="content reveal">
+            <div class="update-date">Last updated: February 21, 2026</div>
+
+            <div class="highlight-box">
+                <p><strong>🔒 TL;DR:</strong> The IronRod desktop application collects <strong>zero data</strong> — no
+                    telemetry, no analytics, no network calls. This website uses Google Analytics and Google AdSense,
+                    which may collect anonymous usage data and serve personalized ads.</p>
+            </div>
+
+            <h2>1. The IronRod Desktop Application</h2>
+            <p>The IronRod desktop application (available for macOS, Windows, and Linux) is designed with privacy as a
+                core principle:</p>
+            <ul>
+                <li><strong>No data collection:</strong> The app does not collect, transmit, or store any personal
+                    information.</li>
+                <li><strong>No telemetry:</strong> No usage analytics, crash reports, or diagnostic data are sent
+                    anywhere.</li>
+                <li><strong>No network access:</strong> The app operates entirely offline. It never connects to the
+                    internet.</li>
+                <li><strong>Read-only scanning:</strong> The app opens your storage devices in strict read-only mode. It
+                    never writes to, modifies, or deletes data on your source drive.</li>
+                <li><strong>Local processing:</strong> All file recovery, analysis, and repair happens locally on your
+                    machine. No data leaves your computer.</li>
+            </ul>
+
+            <h2>2. This Website</h2>
+            <p>This website (<strong>ironrod-d3493.web.app</strong>) uses the following third-party services:</p>
+
+            <h3>2.1 Firebase Hosting</h3>
+            <p>This site is hosted on <a href="https://firebase.google.com/products/hosting" target="_blank"
+                    rel="noopener">Google Firebase Hosting</a>. Firebase may automatically collect:</p>
+            <ul>
+                <li>IP address (for serving content and security)</li>
+                <li>Basic request logs (URL, timestamp, status code)</li>
+            </ul>
+            <p>This data is managed by Google under the <a href="https://policies.google.com/privacy" target="_blank"
+                    rel="noopener">Google Privacy Policy</a>.</p>
+
+            <h3>2.2 Google Analytics (Firebase Analytics)</h3>
+            <p>We use Google Analytics to understand how visitors interact with this website. This helps us improve the
+                site and prioritize features. Analytics may collect:</p>
+            <ul>
+                <li>Pages visited and time spent</li>
+                <li>Scroll depth and section visibility</li>
+                <li>Button clicks (downloads, navigation, FAQ interactions)</li>
+                <li>Device type, browser, operating system, and screen size</li>
+                <li>Approximate geographic location (country/region level, derived from IP)</li>
+                <li>Referral source (how you arrived at the site)</li>
+            </ul>
+            <p>Analytics data is <strong>anonymous and aggregated</strong>. We do not collect names, email addresses, or
+                any personally identifiable information through Analytics.</p>
+            <p>You can opt out of Google Analytics by installing the <a
+                    href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Google Analytics
+                    Opt-out Browser Add-on</a>.</p>
+
+            <h3>2.3 Google AdSense</h3>
+            <p>This website displays advertisements through <a href="https://www.google.com/adsense" target="_blank"
+                    rel="noopener">Google AdSense</a> to help support the project. AdSense may use:</p>
+            <ul>
+                <li><strong>Cookies:</strong> To serve ads based on your prior visits to this site or other sites</li>
+                <li><strong>Web beacons:</strong> To collect non-personal information about ad performance</li>
+                <li><strong>Device identifiers:</strong> For ad personalization and frequency capping</li>
+            </ul>
+            <p>Google uses the <a href="https://policies.google.com/technologies/ads" target="_blank"
+                    rel="noopener">DoubleClick cookie</a> to serve ads. You can opt out of personalized advertising by
+                visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener">Google Ads
+                    Settings</a> or <a href="https://www.aboutads.info/choices/" target="_blank"
+                    rel="noopener">aboutads.info</a>.</p>
+
+            <h2>3. Cookies</h2>
+            <p>This website may set cookies through the third-party services described above. These include:</p>
+            <ul>
+                <li><strong>Analytics cookies:</strong> Used by Google Analytics to distinguish users and track sessions
+                </li>
+                <li><strong>Advertising cookies:</strong> Used by Google AdSense to serve relevant ads and measure ad
+                    performance</li>
+            </ul>
+            <p>We do not set any first-party cookies ourselves. You can manage or block cookies through your browser
+                settings.</p>
+
+            <h2>4. Third-Party Links</h2>
+            <p>This site contains links to external services including:</p>
+            <ul>
+                <li><a href="https://github.com/jeeva-sil/IronRod" target="_blank" rel="noopener">GitHub</a> — for
+                    downloading releases</li>
+                <li><a href="https://buymeacoffee.com/JeevaKannan" target="_blank" rel="noopener">Buy Me a Coffee</a> —
+                    for voluntary donations</li>
+            </ul>
+            <p>These sites have their own privacy policies. We encourage you to review them when visiting.</p>
+
+            <h2>5. Children's Privacy</h2>
+            <p>This website and application are not directed at children under the age of 13. We do not knowingly
+                collect personal information from children.</p>
+
+            <h2>6. Data Security</h2>
+            <p>This website is served over HTTPS, ensuring all data transmitted between your browser and our servers is
+                encrypted. The IronRod application processes all data locally and never transmits it over any
+                network.</p>
+
+            <h2>7. Changes to This Policy</h2>
+            <p>We may update this privacy policy from time to time. Changes will be reflected on this page with an
+                updated "Last updated" date. Continued use of the site after changes constitutes acceptance of the
+                revised policy.</p>
+
+            <h2>8. Contact</h2>
+            <p>If you have questions about this privacy policy, you can reach us at:</p>
+            <ul>
+                <li><strong>Email:</strong> <a href="mailto:dj.official0105@gmail.com">dj.official0105@gmail.com</a></li>
+                <li><strong>GitHub:</strong> <a href="https://github.com/jeeva-sil/IronRod/issues" target="_blank"
+                        rel="noopener">Open an issue</a></li>
+            </ul>
+            <p style="margin-top: 8px;">IronRod is developed and maintained by <strong>DJS Technologies</strong>.</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>© 2026 IronRod. Free to use — no hidden costs, ever.</p>
+            <p style="margin-top: 8px;">🔒 Read-only — your source drive is never modified.</p>
+            <p style="margin-top: 8px;"><a href="privacy.html">Privacy Policy</a> · <a href="contact.html">Contact Us</a></p>
+        </div>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+
+    <!-- Firebase Analytics -->
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics-compat.js"></script>
+    <script src="/analytics.js"></script>
+
+</body>
+
+</html>
